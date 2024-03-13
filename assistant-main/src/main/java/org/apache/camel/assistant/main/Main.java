@@ -35,9 +35,7 @@ public class Main {
     public static final String question = System.getProperty("cai.question");
 
     public static void main(String[] args) {
-        OpenAiChatModel model = OpenAiChatModel.builder().baseUrl(baseUrl)
-                .apiKey(apiKey)
-                .modelName(modelName).build();
+        ChatLanguageModel model = buildModel();
 
         final String answer = model.generate(question);
         System.out.println(answer);
