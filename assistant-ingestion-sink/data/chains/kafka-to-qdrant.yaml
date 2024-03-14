@@ -1,0 +1,26 @@
+apiVersion: camel.apache.org/v1
+kind: Pipe
+metadata:
+  name: kafka-to-qdrant
+  annotations:
+      trait.camel.apache.org/container.image: "quay.io/lburgazzoli/camel-ai-ingestion:latest"
+      trait.camel.apache.org/jvm.enabled: "false"
+      trait.camel.apache.org/kamelets.enabled: "false"
+      trait.camel.apache.org/dependencies.enabled: "false"
+spec:
+  source:
+    ref:
+      kind: KafkaTopic
+      apiVersion: kafka.strimzi.io/v1beta2
+      name: ingestion
+  steps:
+    - ref:
+        kind: Kamelet
+        apiVersion: camel.apache.org/v1
+        name: langchain-embedding-action
+  sink:
+    ref:
+      kind: Collection
+      apiVersion: qdrant.lburgazzoli.github.io/v1alpha1
+      name: camel-ai
+
