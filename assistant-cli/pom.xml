@@ -27,8 +27,8 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>assistant-main</artifactId>
-    <name>Camel Assistant :: Main</name>
+    <artifactId>assistant-cli</artifactId>
+    <name>Camel Assistant :: CLI</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
