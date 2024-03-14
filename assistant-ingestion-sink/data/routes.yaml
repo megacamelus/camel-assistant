@@ -1,0 +1,17 @@
+- route:
+    id: "flow-1"
+    group: "routes"
+    from:
+      uri: "timer:tick"
+      steps:
+        - setBody:
+            constant: "var"
+        - to:
+            uri: "kamelet:langchain-embeddings-action"
+            parameters:
+              embeddingId: foo
+        - to:
+            uri: "log:info"
+            parameters:
+              multiline: true
+              showAll: true

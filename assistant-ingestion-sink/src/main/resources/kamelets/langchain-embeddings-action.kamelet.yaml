@@ -1,0 +1,32 @@
+apiVersion: camel.apache.org/v1
+kind: Kamelet
+metadata:
+  name: langchain-embeddings-action
+  annotations:
+    camel.apache.org/kamelet.support.level: "Experimental"
+    camel.apache.org/catalog.version: "0.0.1"
+    camel.apache.org/provider: "lburgazzoli"
+    camel.apache.org/kamelet.group: "Actions"
+    camel.apache.org/kamelet.namespace: "Transformation"
+  labels:
+    camel.apache.org/kamelet.type: "action"
+spec:
+  definition:
+    title: "Langchain Embeddings Action"
+    description: "Langchain Embeddings"
+    type: object
+    properties:
+      embeddingId:
+        title: Embedding ID
+        description: Embedding ID
+        type: string
+  dependencies:
+    - "camel:kamelet"
+    - "camel:core"
+  template:
+    from:
+      uri: kamelet:source
+      steps:
+        - to: "langchain-embeddings:{{embeddingId}}"
+        - bean:
+            beanType: "com.github.lburgazzoli.camel.ai.ingestion.AsPointStruct"
