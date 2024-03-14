@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
+  <modelVersion>4.0.0</modelVersion>
   <parent>
       <groupId>org.apache.camel.assistant</groupId>
       <artifactId>parent</artifactId>
@@ -17,14 +17,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
-    <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
-    <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
-
-    <quarkus.version>3.6.0</quarkus.version>
-    <camel-quarkus.version>3.6.0</camel-quarkus.version>
-    <camel-k-runtime.version>3.6.0</camel-k-runtime.version>
-    <langchain4j.version>0.27.1</langchain4j.version>
+    <camel-k-runtime.version>3.8.0-SNAPSHOT</camel-k-runtime.version>
 
     <quarkus.container-image.registry>quay.io</quarkus.container-image.registry>
     <quarkus.container-image.group>lburgazzoli</quarkus.container-image.group>
@@ -40,23 +33,16 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>io.quarkus</groupId>
-        <artifactId>quarkus-bom</artifactId>
-        <version>${quarkus.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel.quarkus</groupId>
-        <artifactId>camel-quarkus-bom</artifactId>
-        <version>${camel-quarkus.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
         <groupId>org.apache.camel.k</groupId>
         <artifactId>camel-k-runtime-bom</artifactId>
         <version>${camel-k-runtime.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-bom</artifactId>
+        <version>${camel.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -97,36 +83,20 @@
       <artifactId>camel-quarkus-kafka</artifactId>
     </dependency>
 
-
-    <!-- not yet merged in master -->
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-qdrant</artifactId>
-      <version>4.4.0-SNAPSHOT</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.camel</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-langchain-embeddings</artifactId>
-      <version>4.4.0-SNAPSHOT</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.camel</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>dev.langchain4j</groupId>
       <artifactId>langchain4j-embeddings-all-minilm-l6-v2</artifactId>
-      <version>${langchain4j.version}</version>
+      <version>${langchain4j-version}</version>
     </dependency>
 
     <dependency>
@@ -150,7 +120,7 @@
       <plugin>
         <groupId>io.quarkus.platform</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
-        <version>${quarkus.version}</version>
+        <version>${quarkus.platform.version}</version>
         <extensions>true</extensions>
         <executions>
           <execution>
@@ -161,51 +131,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven-compiler-plugin.version}</version>
-        <configuration>
-          <release>17</release>
-          <compilerArgs>
-            <arg>-parameters</arg>
-          </compilerArgs>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>${maven-surefire-plugin.version}</version>
-        <configuration>
-          <systemPropertyVariables>
-            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-            <maven.home>${maven.home}</maven.home>
-          </systemPropertyVariables>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>${maven-failsafe-plugin.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <systemPropertyVariables>
-            <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
-            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-            <maven.home>${maven.home}</maven.home>
-          </systemPropertyVariables>
-        </configuration>
       </plugin>
     </plugins>
   </build>
