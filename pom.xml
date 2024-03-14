@@ -37,6 +37,7 @@
         <module>parent</module>
         <module>assistant-cli</module>
         <module>assistant-web</module>
+        <module>assistant-ingestion-sink</module>
     </modules>
 
 
