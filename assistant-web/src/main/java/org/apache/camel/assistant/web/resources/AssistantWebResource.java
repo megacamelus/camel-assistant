@@ -17,7 +17,9 @@
 
 package org.apache.camel.assistant.web.resources;
 
+import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -26,11 +28,14 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/api")
 public class AssistantWebResource {
 
+    @Inject
+    CamelAssistant camelAssistant;
+
     @Path("/hello")
-    @GET
+    @POST
     @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        return "Hello from RESTEasy Reactive";
+    public String hello(String question){
+        return camelAssistant.assist(question);
     }
 
 }
