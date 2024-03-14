@@ -28,6 +28,7 @@
 
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
+    <name>Camel Assistant :: Parent</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
