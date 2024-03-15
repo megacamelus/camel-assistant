@@ -20,28 +20,38 @@ package org.apache.camel.assistant.main;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
+import picocli.CommandLine;
 
-public class Main {
 
-    // Defaults to a locally installed, OpenAI-compatible API.
-    public static final String baseUrl = System.getProperty("cai.url", "http://localhost:8000/v1/");
+@CommandLine.Command
+public class Main  implements Runnable {
 
-    // Defaults to a locally installed, OpenAI-compatible API, without the need of an API key
-    public static final String apiKey = System.getProperty("cai.openai.key", "no_api_key");
+    @CommandLine.Option(names = {"--url"}, defaultValue = "http://localhost:8000/v1")
+    String baseUrl;
 
-    public static final String modelType = System.getProperty("cai.model.type", "openai");
-    public static final String modelName = System.getProperty("cai.openapi.model.name");
 
-    public static final String question = System.getProperty("cai.question");
+    @CommandLine.Option(names = {"--api-key"}, defaultValue = "no_api_key")
+    String apiKey;
 
-    public static void main(String[] args) {
+    @CommandLine.Option(names = {"--model-type"}, defaultValue = "openai")
+    String modelType;
+
+    @CommandLine.Option(names = {"--model-name"})
+    String modelName;
+
+    @CommandLine.Parameters(index = "0")
+    String question;
+
+    @Override
+    public void run() {
         ChatLanguageModel model = buildModel();
 
         final String answer = model.generate(question);
+
         System.out.println(answer);
     }
 
-    public static ChatLanguageModel buildModel() {
+    public ChatLanguageModel buildModel() {
         return switch (modelType) {
             case "openai" -> OpenAiChatModel.builder().baseUrl(baseUrl)
                     .apiKey(apiKey)

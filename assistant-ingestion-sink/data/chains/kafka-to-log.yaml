@@ -23,8 +23,5 @@ spec:
       properties:
         embeddingId: 'foo'
   sink:
-    ref:
-      kind: Collection
-      apiVersion: qdrant.lburgazzoli.github.io/v1alpha1
-      name: camel-ai
+    uri: 'log:info'
 

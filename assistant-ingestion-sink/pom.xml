@@ -9,25 +9,17 @@
       <relativePath>../parent/pom.xml</relativePath>
   </parent>
 
- 
+
   <artifactId>assistant-ingestion-sink</artifactId>
   <name>Camel Assistant :: Ingestion :: Sink</name>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-    <camel-k-runtime.version>3.8.0-SNAPSHOT</camel-k-runtime.version>
-
     <quarkus.container-image.registry>quay.io</quarkus.container-image.registry>
-    <quarkus.container-image.group>lburgazzoli</quarkus.container-image.group>
+    <quarkus.container-image.group>megacamelus</quarkus.container-image.group>
     <quarkus.container-image.name>${project.artifactId}</quarkus.container-image.name>
     <quarkus.container-image.tag>latest</quarkus.container-image.tag>
-
     <quarkus.container-image.build>false</quarkus.container-image.build>
     <quarkus.container-image.push>false</quarkus.container-image.push>
-
-    <quarkus.devservices.enabled>false</quarkus.devservices.enabled>
   </properties>
 
   <dependencyManagement>
@@ -39,12 +31,16 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
       <dependency>
         <groupId>org.apache.camel</groupId>
-        <artifactId>camel-bom</artifactId>
+        <artifactId>camel-qdrant</artifactId>
         <version>${camel.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-langchain-embeddings</artifactId>
+        <version>${camel.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -54,7 +50,6 @@
     <dependency>
       <groupId>org.apache.camel.k</groupId>
       <artifactId>camel-k-runtime</artifactId>
-      <version>${camel-k-runtime.version}</version>
     </dependency>
 
     <dependency>
@@ -96,7 +91,6 @@
     <dependency>
       <groupId>dev.langchain4j</groupId>
       <artifactId>langchain4j-embeddings-all-minilm-l6-v2</artifactId>
-      <version>${langchain4j-version}</version>
     </dependency>
 
     <dependency>
@@ -118,9 +112,8 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>io.quarkus.platform</groupId>
+        <groupId>${quarkus.platform.group-id}</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
-        <version>${quarkus.platform.version}</version>
         <extensions>true</extensions>
         <executions>
           <execution>
