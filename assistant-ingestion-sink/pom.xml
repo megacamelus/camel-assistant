@@ -2,6 +2,7 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
       <groupId>org.apache.camel.assistant</groupId>
       <artifactId>parent</artifactId>
@@ -9,17 +10,11 @@
       <relativePath>../parent/pom.xml</relativePath>
   </parent>
 
-
   <artifactId>assistant-ingestion-sink</artifactId>
   <name>Camel Assistant :: Ingestion :: Sink</name>
 
   <properties>
-    <quarkus.container-image.registry>quay.io</quarkus.container-image.registry>
-    <quarkus.container-image.group>megacamelus</quarkus.container-image.group>
     <quarkus.container-image.name>${project.artifactId}</quarkus.container-image.name>
-    <quarkus.container-image.tag>latest</quarkus.container-image.tag>
-    <quarkus.container-image.build>false</quarkus.container-image.build>
-    <quarkus.container-image.push>false</quarkus.container-image.push>
   </properties>
 
   <dependencyManagement>
@@ -36,6 +31,12 @@
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-qdrant</artifactId>
         <version>${camel.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.camel</groupId>
@@ -97,6 +98,7 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>
     </dependency>
+
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-container-image-jib</artifactId>
