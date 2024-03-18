@@ -33,9 +33,22 @@
     <name>Camel Assistant :: Parent</name>
 
     <properties>
-        <langchain4j.version>0.28.0</langchain4j.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
 
-        <quarkus.langchain.version>0.9.1</quarkus.langchain.version>
+        <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <maven-plugin-plugin.version>3.8.1</maven-plugin-plugin.version>
+        <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
+        <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
+        <maven-site-plugin.version>3.12.1</maven-site-plugin.version>
+        <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+        <maven-enforcer-plugin-version>3.2.1</maven-enforcer-plugin-version>
 
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
@@ -45,10 +58,19 @@
         <camel-quarkus.platform.artifact-id>quarkus-camel-bom</camel-quarkus.platform.artifact-id>
         <camel-quarkus.platform.version>${quarkus.platform.version}</camel-quarkus.platform.version>
 
+        <langchain4j.version>0.28.0</langchain4j.version>
         <picocli.version>4.7.5</picocli.version>
 
         <camel.version>4.5.0-SNAPSHOT</camel.version>
         <camel-k-runtime.version>3.8.0-SNAPSHOT</camel-k-runtime.version>
+
+        <quarkus.langchain.version>0.9.1</quarkus.langchain.version>
+
+        <quarkus.container-image.registry>quay.io</quarkus.container-image.registry>
+        <quarkus.container-image.group>megacamelus</quarkus.container-image.group>
+        <quarkus.container-image.tag>latest</quarkus.container-image.tag>
+        <quarkus.container-image.build>false</quarkus.container-image.build>
+        <quarkus.container-image.push>false</quarkus.container-image.push>
     </properties>
 
     <dependencyManagement>
@@ -140,6 +162,108 @@
                     <groupId>${quarkus.platform.group-id}</groupId>
                     <artifactId>quarkus-maven-plugin</artifactId>
                     <version>${quarkus.platform.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                            <maven.home>${maven.home}</maven.home>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                            <maven.home>${maven.home}</maven.home>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                                <goal>add-resource</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/generated/java</source>
+                                </sources>
+                                <resources>
+                                    <resource>
+                                        <directory>src/generated/resources</directory>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${maven-install-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin.version}</version>
+                    <configuration>
+                        <propertiesEncoding>${project.build.sourceEncoding}</propertiesEncoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.camel</groupId>
+                    <artifactId>camel-package-maven-plugin</artifactId>
+                    <version>${camel.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven-clean-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven-deploy-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${maven-site-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven-enforcer-plugin-version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

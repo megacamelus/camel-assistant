@@ -1,0 +1,24 @@
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "19:30"
+      timezone: Europe/Paris
+    open-pull-requests-limit: 0
+    labels:
+      - area/dependencies
+    ignore:
+      - dependency-name: io.quarkus:*
+      - dependency-name: org.apache.camel:*
+      - dependency-name: org.apache.camel.k:*
+      - dependency-name: org.apache.camel.quarkus:*
+      - dependency-name: org.apache.camel.kamelets:*
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "19:30"
+      timezone: Europe/Paris
+    open-pull-requests-limit: 0

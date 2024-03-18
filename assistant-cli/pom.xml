@@ -20,6 +20,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.apache.camel.assistant</groupId>
         <artifactId>parent</artifactId>
@@ -29,6 +30,10 @@
 
     <artifactId>assistant-cli</artifactId>
     <name>Camel Assistant :: CLI</name>
+
+    <properties>
+        <quarkus.container-image.name>${project.artifactId}</quarkus.container-image.name>
+    </properties>
 
     <dependencies>
 
@@ -48,6 +53,11 @@
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-open-ai</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-container-image-jib</artifactId>
         </dependency>
     </dependencies>
 
