@@ -5,6 +5,11 @@ on:
     branches:
       - "main"
 
+
+env:
+  PROJECTS: ${{ github.workspace }}
+  OPERATOR_IMAGE: "quay.io/megacamelus/assistant-backend"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,4 +35,58 @@ jobs:
         mvn -B install \
           -Dquarkus.container-image.build=true \
           -Dquarkus.container-image.push=true
-        
+
+  pr:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: "Checkout - Camel Assistant Manifests"
+        uses: actions/checkout@v4
+        with:
+          repository: megacamelus/camel-assistant-manifests
+          token: ${{ secrets.PR_TOKEN }}
+
+      - name: "Determine Container image name"
+        id: "compute-image-name"
+        run: |
+          IMAGE_DIGEST=$(docker run --rm gcr.io/go-containerregistry/crane digest ${OPERATOR_IMAGE}:latest)
+          IMAGE_NAME="${OPERATOR_IMAGE}@${IMAGE_DIGEST}"
+
+          echo "operator_image=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: "Create PR for camel-assistant-manifests"
+        env:
+          GH_TOKEN: ${{ secrets.PR_TOKEN }}
+          IMAGE_NAME:  ${{ steps.compute-image-name.outputs.operator_image }}
+          BRANCH_NAME: ci-${{ github.run_id }}
+        run: |
+          echo "###############################################################################"
+          echo "operator image : ${OPERATOR_IMAGE}"
+          echo "image name     : ${IMAGE_NAME}"
+          echo "branch         : ${BRANCH_NAME}"
+          echo "###############################################################################"
+
+          tree .
+
+          (cd etc/kubernetes/apps/assistant && kustomize edit set image ${IMAGE_NAME})
+          
+          cat etc/kubernetes/apps/assistant/kustomization.yaml
+
+          git checkout -b "${BRANCH_NAME}"
+          git config user.email "megacamelus@megacamelus.github.com"
+          git config user.name "megacamelus"
+          git commit -m "Update assistant-backend image" etc/kubernetes/apps/assistant/kustomization.yaml
+          git reset --hard
+          git push -u origin ${BRANCH_NAME}
+
+          # GH CLI can't find the branch on remote... needs some time :)
+          sleep 15
+
+          gh config set prompt disabled
+
+          gh pr create \
+            --fill \
+            --base main \
+            --title "chore(qdrant): update assistant-backend image to ${IMAGE_NAME}" \
+            --body "image: ${IMAGE_NAME}"
