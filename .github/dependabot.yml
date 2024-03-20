@@ -6,7 +6,6 @@ updates:
       interval: daily
       time: "19:30"
       timezone: Europe/Paris
-    open-pull-requests-limit: 0
     labels:
       - area/dependencies
     ignore:
@@ -21,4 +20,3 @@ updates:
       interval: daily
       time: "19:30"
       timezone: Europe/Paris
-    open-pull-requests-limit: 0
