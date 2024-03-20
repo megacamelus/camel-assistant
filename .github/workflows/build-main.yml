@@ -83,7 +83,7 @@ jobs:
           git checkout -b "${BRANCH_NAME}"
           git config user.email "megacamelus@megacamelus.github.com"
           git config user.name "megacamelus"
-          git commit -m "Update assistant-backend image" etc/kubernetes/apps/assistant/kustomization.yaml
+          git commit -m "Update assistant images" etc/kubernetes/apps/assistant/kustomization.yaml
           git reset --hard
           git push -u origin ${BRANCH_NAME}
 
@@ -95,5 +95,5 @@ jobs:
           gh pr create \
             --fill \
             --base main \
-            --title "chore(qdrant): update assistant-backend image to ${IMAGE_NAME}" \
-            --body "image: ${IMAGE_NAME}"
+            --title "chore(assistant): update assistant images" \
+            --body "backend-image: ${BACKEND_IMAGE_NAME}, frontend-image: ${FRONTEND_IMAGE_NAME}"
