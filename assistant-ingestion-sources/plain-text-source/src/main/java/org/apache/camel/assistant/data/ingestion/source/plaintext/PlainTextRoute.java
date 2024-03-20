@@ -24,8 +24,6 @@ public class PlainTextRoute extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        restConfiguration().port("{{rest.port:8081}}");
-
         rest("/api")
                 .get("/hello").to("direct:hello")
                 .post("/consume")
