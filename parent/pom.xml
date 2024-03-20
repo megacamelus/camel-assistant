@@ -60,6 +60,7 @@
 
         <langchain4j.version>0.28.0</langchain4j.version>
         <picocli.version>4.7.5</picocli.version>
+        <vaadin.version>24.3.7</vaadin.version>
 
         <camel.version>4.5.0-SNAPSHOT</camel.version>
         <camel-k-runtime.version>3.8.0-SNAPSHOT</camel-k-runtime.version>
@@ -137,6 +138,11 @@
                 <version>${langchain4j.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-quarkus-extension</artifactId>
+                <version>${vaadin.version}</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>
@@ -264,6 +270,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <version>${maven-enforcer-plugin-version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-maven-plugin</artifactId>
+                    <version>${vaadin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

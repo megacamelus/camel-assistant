@@ -8,7 +8,8 @@ on:
 
 env:
   PROJECTS: ${{ github.workspace }}
-  OPERATOR_IMAGE: "quay.io/megacamelus/assistant-backend"
+  BACKEND_IMAGE: "quay.io/megacamelus/assistant-backend"
+  FRONTEND_IMAGE: "quay.io/megacamelus/assistant-ui-vaadin"
 
 jobs:
   build:
@@ -50,26 +51,32 @@ jobs:
       - name: "Determine Container image name"
         id: "compute-image-name"
         run: |
-          IMAGE_DIGEST=$(docker run --rm gcr.io/go-containerregistry/crane digest ${OPERATOR_IMAGE}:latest)
-          IMAGE_NAME="${OPERATOR_IMAGE}@${IMAGE_DIGEST}"
+          BACKEND_IMAGE_DIGEST=$(docker run --rm gcr.io/go-containerregistry/crane digest ${BACKEND_IMAGE}:latest)
+          BACKEND_IMAGE_NAME="${BACKEND_IMAGE}@${BACKEND_IMAGE_DIGEST}"
 
-          echo "operator_image=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          FRONTEND_IMAGE_DIGEST=$(docker run --rm gcr.io/go-containerregistry/crane digest ${FRONTEND_IMAGE}:latest)
+          FRONTEND_IMAGE_NAME="${FRONTEND_IMAGE}@${FRONTEND_IMAGE_DIGEST}"
+          
+          echo "backend-image=${BACKEND_IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "frontend-image=${FRONTEND_IMAGE_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: "Create PR for camel-assistant-manifests"
         env:
           GH_TOKEN: ${{ secrets.PR_TOKEN }}
-          IMAGE_NAME:  ${{ steps.compute-image-name.outputs.operator_image }}
+          BACKEND_IMAGE_NAME:  ${{ steps.compute-image-name.outputs.backend-image }}
+          FRONTEND_IMAGE_NAME:  ${{ steps.compute-image-name.outputs.frontend-image }}
           BRANCH_NAME: ci-${{ github.run_id }}
         run: |
           echo "###############################################################################"
-          echo "operator image : ${OPERATOR_IMAGE}"
-          echo "image name     : ${IMAGE_NAME}"
+          echo "backend image  : ${BACKEND_IMAGE_NAME}"
+          echo "frontend image : ${FRONTEND_IMAGE_NAME}"
           echo "branch         : ${BRANCH_NAME}"
           echo "###############################################################################"
 
           tree .
 
-          (cd etc/kubernetes/apps/assistant && kustomize edit set image ${IMAGE_NAME})
+          (cd etc/kubernetes/apps/assistant && kustomize edit set image ${BACKEND_IMAGE_NAME})
+          (cd etc/kubernetes/apps/assistant && kustomize edit set image ${FRONTEND_IMAGE_NAME})
           
           cat etc/kubernetes/apps/assistant/kustomization.yaml
 
