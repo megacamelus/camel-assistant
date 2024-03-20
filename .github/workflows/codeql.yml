@@ -69,7 +69,8 @@ jobs:
     - if: matrix.language == 'java-kotlin'
       uses: actions/setup-java@v1
       with:
-        java-version: 17
+        java-version: '17'
+        distribution: 'temurin'
 
     - name: Autobuild
       uses: github/codeql-action/autobuild@v3
