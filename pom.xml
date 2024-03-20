@@ -38,6 +38,7 @@
         <module>assistant-backend</module>
         <module>assistant-ingestion-sink</module>
         <module>assistant-ingestion-sources</module>
+        <module>assistant-ui-vaadin</module>
     </modules>
 
 
