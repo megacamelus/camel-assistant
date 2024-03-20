@@ -39,18 +39,18 @@ curl -X POST http://localhost:8080/api/hello \
 
 #` Running with a different AI service`
 
-1. Edit the file `application.properties` and modify the following properties: 
+1. Edit the file `application.properties` and modify the following properties if the defaults are inadequate for your scenario: 
 
 ```
-quarkus.langchain4j.chat-model.provider=openai
-quarkus.langchain4j.openai.api-key=no_api_key
-quarkus.langchain4j.openai.base-url=http://localhost:8000/v1/
+%local-openai.quarkus.langchain4j.chat-model.provider=openai
+%local-openai.quarkus.langchain4j.openai.api-key=no_api_key
+%local-openai.quarkus.langchain4j.openai.base-url=http://localhost:8000/v1/
 ```
 
 2. (Optional) Adjust other properties required for your environment
 
 ```
-quarkus.langchain4j.openai.*.chat-model.model-name=some-other-model
+%local-openai.quarkus.langchain4j.openai.*.chat-model.model-name=some-other-model
 ```
 
 3. Build the application 
@@ -62,6 +62,5 @@ mvn clean package
 4. Then, to run the application:
 
 ```
-mvn clean package 
-java -jar target/quarkus-app/quarkus-run.jar
+mvn clean -Dquarkus.profile=local-openai quarkus:dev 
 ```
