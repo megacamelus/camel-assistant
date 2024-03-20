@@ -28,8 +28,8 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>assistant-web</artifactId>
-    <name>Camel Assistant :: Web</name>
+    <artifactId>assistant-backend</artifactId>
+    <name>Camel Assistant :: Backend</name>
 
     <properties>
         <quarkus.container-image.name>${project.artifactId}</quarkus.container-image.name>
@@ -70,6 +70,7 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-container-image-jib</artifactId>
         </dependency>
+
     </dependencies>
 
     <build>
