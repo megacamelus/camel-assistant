@@ -11,7 +11,7 @@ public class AssistantProducers {
     public QdrantClient qdrantClient(AssistantConfiguration configuration) {
         QdrantGrpcClient gc = QdrantGrpcClient.newBuilder(
                 configuration.qdrant().host(),
-                configuration.qdrant().grpcPort(),
+                configuration.qdrant().port(),
                 false)
             .build();
 
