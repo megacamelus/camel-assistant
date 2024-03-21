@@ -28,5 +28,5 @@ spec:
       uri: kamelet:source
       steps:
         - to: "langchain-embeddings:{{embeddingId}}"
-        - bean:
-            beanType: "org.apache.camel.assistant.data.ingestion.sink.AsPointStruct"
+        - transform:
+            toType: qdrant:embeddings
