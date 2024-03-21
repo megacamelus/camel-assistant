@@ -28,7 +28,7 @@ public class AssistantReadiness implements HealthCheck {
 
     @PostConstruct
     void init() {
-        this.client = new QdrantClient(QdrantGrpcClient.newBuilder(host, port).build());
+        this.client = new QdrantClient(QdrantGrpcClient.newBuilder(host, port, false).build());
     }
 
     @PreDestroy
