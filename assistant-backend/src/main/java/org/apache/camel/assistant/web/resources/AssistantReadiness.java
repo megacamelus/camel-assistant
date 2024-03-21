@@ -23,12 +23,12 @@ public class AssistantReadiness implements HealthCheck {
     public HealthCheckResponse call() {
         HealthCheckResponseBuilder rb = HealthCheckResponse.named("Qdrant connection health check")
             .withData("qdrant.host", configuration.qdrant().host())
-            .withData("qdrant.port", configuration.qdrant().grpcPort())
-            .withData("qdrant.collection", configuration.qdrant().collectionName());
+            .withData("qdrant.port", configuration.qdrant().port())
+            .withData("qdrant.collection", configuration.qdrant().collection().name());
 
         try {
             Collections.CollectionInfo reply =
-                client.getCollectionInfoAsync(configuration.qdrant().collectionName(), Duration.ofSeconds(5)).get();
+                client.getCollectionInfoAsync(configuration.qdrant().collection().name(), Duration.ofSeconds(5)).get();
 
             rb.withData("collection.status", reply.getStatus().name());
 

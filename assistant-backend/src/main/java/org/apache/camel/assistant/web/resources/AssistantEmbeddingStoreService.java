@@ -17,7 +17,7 @@ public class AssistantEmbeddingStoreService {
     @Named
     QdrantEmbeddingStore store() {
             return QdrantEmbeddingStore.builder()
-                    .collectionName(configuration.qdrant().collectionName())
+                    .collectionName(configuration.qdrant().collection().name())
                     .client(client)
                     .build();
     }

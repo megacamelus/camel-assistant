@@ -2,23 +2,24 @@ package org.apache.camel.assistant.web.resources;
 
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
-import io.smallrye.config.WithName;
 
-@ConfigMapping
+@ConfigMapping(prefix = "camel.assistant")
 public interface AssistantConfiguration {
 
     Qdrant qdrant();
 
     interface Qdrant {
-        @WithName("collection.name")
-        String collectionName();
+        Collection collection();
 
         @WithDefault("localhost")
-        @WithName("host")
         String host();
 
         @WithDefault("6334")
-        @WithName("grpc.port")
-        int grpcPort();
+        int port();
+
+        interface Collection {
+            @WithDefault("camel")
+            String name();
+        }
     }
 }
