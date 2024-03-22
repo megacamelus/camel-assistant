@@ -1,7 +1,7 @@
 apiVersion: camel.apache.org/v1
 kind: Kamelet
 metadata:
-  name: qdrant-upsert-action
+  name: qdrant-upsert-sink
   annotations:
     camel.apache.org/kamelet.support.level: "Experimental"
     camel.apache.org/catalog.version: "0.0.1"
@@ -13,7 +13,7 @@ metadata:
 spec:
   definition:
     title: "Qdrant Upsert Sink"
-    description: ""Qdrant Upsert Sink"
+    description: "Qdrant Upsert Sink"
     type: object
     properties:
       collectionName:
