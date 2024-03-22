@@ -1,7 +1,7 @@
 apiVersion: camel.apache.org/v1
 kind: Pipe
 metadata:
-  name: kafka-to-qdrant
+  name: kafka-to-log
   annotations:
       trait.camel.apache.org/container.image: 'quay.io/lburgazzoli/camel-ai-ingestion:latest'
       trait.camel.apache.org/jvm.enabled: 'false'
