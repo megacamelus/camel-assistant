@@ -1,0 +1,19 @@
+apiVersion: camel.apache.org/v1
+kind: Pipe
+metadata:
+  name: kafka-to-qdrant
+  annotations:
+      trait.camel.apache.org/container.image: 'quay.io/lburgazzoli/camel-ai-ingestion:latest'
+      trait.camel.apache.org/jvm.enabled: 'false'
+      trait.camel.apache.org/kamelets.enabled: 'false'
+      trait.camel.apache.org/dependencies.enabled: 'false'
+spec:
+  source:
+    ref:
+      kind: Kamelet
+      apiVersion: camel.apache.org/v1
+      name: qdrant-create-action
+  sink:
+    uri: 'log:info'
+
+
