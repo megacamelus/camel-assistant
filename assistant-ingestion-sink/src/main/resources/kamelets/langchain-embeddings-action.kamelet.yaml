@@ -24,9 +24,14 @@ spec:
     - "camel:kamelet"
     - "camel:core"
   template:
+    beans:
+      - name: collectionProcessorBean
+        type: "#class:org.apache.camel.assistant.data.ingestion.sink.CollectionProcessor"
     from:
       uri: kamelet:source
       steps:
+        - process:
+            ref: "{{collectionProcessorBean}}"
         - to: "langchain-embeddings:{{embeddingId}}"
         - transform:
             toType: qdrant:embeddings
