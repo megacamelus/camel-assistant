@@ -17,41 +17,102 @@
 
 package org.apache.camel.assistant.data.ingestion.sink;
 
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.LongAdder;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.transaction.Transactional;
 
 import io.qdrant.client.PointIdFactory;
 import io.qdrant.client.grpc.Points;
+import io.quarkus.arc.Unremovable;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
+import org.apache.camel.assistant.data.ingestion.sink.entities.Mapping;
+import org.apache.camel.assistant.data.ingestion.sink.repository.MappingRepository;
+import org.apache.camel.component.kafka.KafkaConstants;
 import org.apache.camel.component.qdrant.Qdrant;
+import org.apache.camel.util.ObjectHelper;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.Headers;
 import org.jboss.logging.Logger;
 
+@ApplicationScoped
+@Named("collectionProcessorBean")
+@Unremovable
+@Transactional
 public class CollectionProcessor implements Processor {
-    private static final LongAdder ADDER = new LongAdder();
     private static final Logger LOG = Logger.getLogger(CollectionProcessor.class);
+    private static final String EXTERNAL_ID = "id";
+    private static final String EXTERNAL_SOURCE = "source";
+    private static final String DYNAMIC = "dynamic";
+
+    @Inject
+    MappingRepository mappingRepository;
 
     @Override
     public void process(Exchange exchange) throws Exception {
         Message message = exchange.getMessage();
 
-        final String body = exchange.getMessage().getBody(String.class);
-        if (body != null) {
-            Points.PointId id = message.getHeader(Qdrant.Headers.POINT_ID, Points.PointId.class);
+        logHeaders(message);
 
-            if (id != null) {
-                LOG.infof("Processing message with ID: %s", id.getUuid());
-            } else {
-                id = PointIdFactory.id(UUID.randomUUID());
-                LOG.infof("Using the newly created ID: %s", id.getUuid());
+        boolean dynamic = message.getHeader(DYNAMIC, false, Boolean.class);
+        if (dynamic) {
+            String externalId = message.getHeader(EXTERNAL_ID, String.class);
+            String externalSource = message.getHeader(EXTERNAL_SOURCE, String.class);
 
-                message.setHeader(Qdrant.Headers.POINT_ID, id);
+            if (ObjectHelper.isEmpty(externalId) || ObjectHelper.isEmpty(externalSource)) {
+                // fail
             }
-        } else {
-            LOG.warnf("Payload body: %s = %s", exchange.getMessage().getBody());
-            LOG.warnf("Processing body of type: %s", exchange.getMessage().getBody().getClass());
+
+            // Check if an internal ID exists on the DB
+            Points.PointId id;
+            Mapping mapping = mappingRepository.findByExternal(externalId, externalSource);
+            if (mapping == null) {
+                // ... if it does not, then create a new internal ID and persist it on the DB
+                final UUID uuid = createNewRecord(message);
+
+                id = PointIdFactory.id(uuid);
+            } else {
+                LOG.infof("Found a previous record of this on the DB with internal_id = %s", mapping.internalId);
+
+                // otherwise, use that ID to replace the value on the vector DB
+                id = PointIdFactory.id(UUID.fromString(mapping.internalId));
+            }
+
+            message.setHeader(Qdrant.Headers.POINT_ID, id);
+        }
+    }
+
+    private UUID createNewRecord(Message message) {
+        final UUID uuid = UUID.randomUUID();
+        Mapping mapping;
+        mapping = new Mapping();
+
+        mapping.internalId = uuid.toString();
+        mapping.externalId = message.getHeader("id", String.class);
+        mapping.externalSource = message.getHeader("source", String.class);
+
+        LOG.infof("There is no previous record of this on the DB, therefore created a new one with internal_id = %s",
+                mapping.internalId);
+
+        mappingRepository.persist(mapping);
+
+        return uuid;
+    }
+
+    private static void logHeaders(Message message) {
+        var headers = message.getHeaders();
+
+        for (var entry : headers.entrySet()) {
+            LOG.infof("Consuming header: %s = %s", entry.getKey(), entry.getValue());
+        }
+
+        Headers kafkaHeaders = message.getHeader(KafkaConstants.HEADERS, Headers.class);
+        for (Header header : kafkaHeaders) {
+            LOG.infof("Consuming Kafka header: %s = %s", header.key(), new String(header.value()));
         }
     }
 }
