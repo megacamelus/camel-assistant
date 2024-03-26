@@ -19,22 +19,26 @@ package org.apache.camel.assistant.data.ingestion.source.plaintext;
 
 import org.apache.camel.builder.RouteBuilder;
 
-
 public class PlainTextRoute extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
         rest("/api")
                 .get("/hello").to("direct:hello")
-                .post("/consume")
-                .to("direct:consume");
+                .post("/consume/static").to("direct:consumeStatic")
+                .post("/consume/dynamic/{source}/{id}").to("direct:consumeDynamic");
 
         from("direct:hello")
                 .routeId("source-web-hello")
                 .transform().constant("Hello World");
 
-        from("direct:consume")
-                .routeId("source-consume-route")
+        from("direct:consumeDynamic")
+                .routeId("source-consume-dynamic-route")
+                .setHeader("dynamic", constant("true"))
+                .to("kafka:ingestion?brokers={{bootstrap.servers}}");
+
+        from("direct:consumeStatic")
+                .routeId("source-consume-static-route")
                 .to("kafka:ingestion?brokers={{bootstrap.servers}}");
     }
 }
