@@ -15,28 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.camel.assistant.main;
+package org.apache.camel.assistant.main.learn;
 
-import java.util.concurrent.Callable;
+import java.util.Set;
 
-import io.quarkus.picocli.runtime.annotations.TopCommand;
-import org.apache.camel.assistant.main.command.Learn;
-import picocli.CommandLine;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
-@TopCommand
-@CommandLine.Command(name = "camel-assistant", subcommands = { Learn.class})
-public class Main implements Runnable {
+// api/consume/dynamic/cli.org/1
 
-    private static CommandLine commandLine;
+@Path("/api/consume")
+public interface LearnService {
 
-    @CommandLine.Option(names = {"--url"}, defaultValue = "http://localhost:8000/v1")
-    String baseUrl;
+    @POST
+    @Produces({MediaType.TEXT_PLAIN})
+    @Consumes({MediaType.TEXT_PLAIN})
+    @Path("/dynamic/{source}/{id}")
+    String learnDynamic(@PathParam("source") String source, @PathParam("id") String id, String data);
 
-    @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "Display the help and sub-commands")
-    private boolean helpRequested = false;
 
-    @Override
-    public void run() {
-        System.out.println("Running");
-    }
+    @POST
+    @Produces({MediaType.TEXT_PLAIN})
+    @Consumes({MediaType.TEXT_PLAIN})
+    @Path("/static/")
+    String learnStatic(String data);
+
 }
