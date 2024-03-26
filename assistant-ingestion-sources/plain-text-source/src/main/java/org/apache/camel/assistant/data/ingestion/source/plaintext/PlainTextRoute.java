@@ -35,10 +35,12 @@ public class PlainTextRoute extends RouteBuilder {
         from("direct:consumeDynamic")
                 .routeId("source-consume-dynamic-route")
                 .setHeader("dynamic", constant("true"))
-                .to("kafka:ingestion?brokers={{bootstrap.servers}}");
+                .to("kafka:ingestion?brokers={{bootstrap.servers}}")
+                .transform().constant("Dynamic data loaded");
 
         from("direct:consumeStatic")
                 .routeId("source-consume-static-route")
-                .to("kafka:ingestion?brokers={{bootstrap.servers}}");
+                .to("kafka:ingestion?brokers={{bootstrap.servers}}")
+                .transform().constant("Static data loaded");
     }
 }

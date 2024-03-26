@@ -15,28 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.camel.assistant.main;
+package org.apache.camel.assistant.main.command;
 
-import java.util.concurrent.Callable;
 
-import io.quarkus.picocli.runtime.annotations.TopCommand;
-import org.apache.camel.assistant.main.command.Learn;
 import picocli.CommandLine;
 
-@TopCommand
-@CommandLine.Command(name = "camel-assistant", subcommands = { Learn.class})
-public class Main implements Runnable {
-
-    private static CommandLine commandLine;
-
-    @CommandLine.Option(names = {"--url"}, defaultValue = "http://localhost:8000/v1")
-    String baseUrl;
+public abstract class BaseCommand implements Runnable {
 
     @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "Display the help and sub-commands")
     private boolean helpRequested = false;
-
-    @Override
-    public void run() {
-        System.out.println("Running");
-    }
 }
