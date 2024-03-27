@@ -17,29 +17,50 @@
 
 package org.apache.camel.assistant.data.ingestion.source.plaintext;
 
+import java.io.IOException;
+
+import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 
 public class PlainTextRoute extends RouteBuilder {
+
+    private void convertBytesToPDFFile(Exchange e) throws IOException {
+        // TODO: Camel should probably do this itself
+        PDDocument document = Loader.loadPDF(e.getMessage().getBody(byte[].class));
+
+        e.getMessage().setBody(document);
+    }
 
     @Override
     public void configure() throws Exception {
         rest("/api")
                 .get("/hello").to("direct:hello")
-                .post("/consume/static").to("direct:consumeStatic")
-                .post("/consume/dynamic/{source}/{id}").to("direct:consumeDynamic");
+                .post("/consume/text/static").to("direct:consumeTextStatic")
+                .post("/consume/text/dynamic/{source}/{id}").consumes("application/octet-stream").to("direct:consumeTextDynamic")
+                .post("/consume/pdf/static").to("direct:consumePdfStatic");
 
         from("direct:hello")
                 .routeId("source-web-hello")
                 .transform().constant("Hello World");
 
-        from("direct:consumeDynamic")
-                .routeId("source-consume-dynamic-route")
+
+        from("direct:consumePdfStatic")
+                .routeId("source-consume-pdf-static-route")
+                .process(this::convertBytesToPDFFile)
+                .pipeline()
+                    .to("pdf:extractText")
+                    .to("direct:consumeTextStatic");
+
+        from("direct:consumeTextDynamic")
+                .routeId("source-consume-text-dynamic-route")
                 .setHeader("dynamic", constant("true"))
                 .to("kafka:ingestion?brokers={{bootstrap.servers}}")
                 .transform().constant("Dynamic data loaded");
 
-        from("direct:consumeStatic")
-                .routeId("source-consume-static-route")
+        from("direct:consumeTextStatic")
+                .routeId("source-consume-text-static-route")
                 .to("kafka:ingestion?brokers={{bootstrap.servers}}")
                 .transform().constant("Static data loaded");
     }

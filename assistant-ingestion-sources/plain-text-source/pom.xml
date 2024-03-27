@@ -66,6 +66,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.camel.quarkus</groupId>
+            <artifactId>camel-quarkus-pdf</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>
@@ -74,6 +79,9 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-container-image-jib</artifactId>
         </dependency>
+
+        <!-- for PDF consumption -->
+
 
         <dependency>
             <groupId>io.quarkus</groupId>
