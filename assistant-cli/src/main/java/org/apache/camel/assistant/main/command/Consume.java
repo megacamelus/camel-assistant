@@ -39,12 +39,15 @@ public class Consume extends BaseCommand {
     @CommandLine.Option(names = {"--data"}, description = "The data to load", arity = "0..1", required = true)
     private String data;
 
+    @CommandLine.Option(names = {"--address"}, description = "The service address", arity = "0..1", required = true, defaultValue = "http://localhost:8083")
+    private String address;
+
     ConsumeService learnService;
 
     @Override
     public void run() {
         learnService = QuarkusRestClientBuilder.newBuilder()
-                .baseUri(URI.create("http://localhost:8083"))
+                .baseUri(URI.create(address))
                 .build(ConsumeService.class);
 
         if (dynamic) {
