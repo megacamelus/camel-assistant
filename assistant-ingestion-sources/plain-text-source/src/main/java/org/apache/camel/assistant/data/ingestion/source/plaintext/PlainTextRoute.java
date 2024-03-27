@@ -18,20 +18,68 @@
 package org.apache.camel.assistant.data.ingestion.source.plaintext;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.jboss.logging.Logger;
 
 public class PlainTextRoute extends RouteBuilder {
+    private static final Logger LOG = Logger.getLogger(PlainTextRoute.class);
+
+    private static final String DATA_SIZE = "DATA_SIZE";
+
+    // By default, Kafka won't accept payloads greater than 1048576,
+    // give the additional data that may transit, we limit it to a much
+    // lower value
+    private static final int MAX_DATA_SIZE = 1000000;
+
+    private void filter(Exchange exchange) {
+        String unfilteredData = exchange.getMessage().getBody(String.class);
+
+        exchange.getMessage().setBody(unfilteredData.replace('\n', ' '));
+    }
 
     private void convertBytesToPDFFile(Exchange e) throws IOException {
-        // TODO: Camel should probably do this itself
-        PDDocument document = Loader.loadPDF(e.getMessage().getBody(byte[].class));
+        final byte[] body = e.getMessage().getBody(byte[].class);
 
+        // TODO: Camel should probably do this itself
+        PDDocument document = Loader.loadPDF(body);
+
+        e.getMessage().setHeader(DATA_SIZE, body.length);
         e.getMessage().setBody(document);
     }
+
+    public static class CustomSplitter {
+        // TODO: this is very heavy and slow ... optimize this
+        public List<String> largeDataSplitter(Exchange exchange) {
+            final String body = exchange.getMessage().getBody(String.class);
+            List<String> strings = new ArrayList<>();
+
+            int pos = 0;
+            do {
+                int endPos = pos + MAX_DATA_SIZE;
+                if (endPos > body.length()) {
+                    endPos = body.length();
+                }
+
+                LOG.infof("Splitting from %d to %d", pos, endPos);
+                String part = body.substring(pos, endPos);
+
+                strings.add(part);
+
+                pos += part.length();
+            } while (pos < body.length());
+
+            LOG.infof("Finished splitting: %d parts", strings.size());
+            return strings;
+        }
+    }
+
+
 
     @Override
     public void configure() throws Exception {
@@ -51,7 +99,15 @@ public class PlainTextRoute extends RouteBuilder {
                 .process(this::convertBytesToPDFFile)
                 .pipeline()
                     .to("pdf:extractText")
-                    .to("direct:consumeTextStatic");
+                    .process(this::filter)
+                    .choice()
+                        .when(header(DATA_SIZE).isGreaterThan(MAX_DATA_SIZE))
+                            .split(method(new CustomSplitter(), "largeDataSplitter")).streaming()
+                            .to("kafka:ingestion?brokers={{bootstrap.servers}}")
+                            .endChoice()
+                    .otherwise()
+                        .to("kafka:ingestion?brokers={{bootstrap.servers}}");
+
 
         from("direct:consumeTextDynamic")
                 .routeId("source-consume-text-dynamic-route")
