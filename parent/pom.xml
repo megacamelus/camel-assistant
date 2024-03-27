@@ -65,7 +65,7 @@
         <camel.version>4.5.0-SNAPSHOT</camel.version>
         <camel-k-runtime.version>3.8.0-SNAPSHOT</camel-k-runtime.version>
 
-        <quarkus.langchain.version>0.9.1</quarkus.langchain.version>
+        <quarkus.langchain.version>0.10.1</quarkus.langchain.version>
 
         <quarkus.container-image.registry>quay.io</quarkus.container-image.registry>
         <quarkus.container-image.group>megacamelus</quarkus.container-image.group>
