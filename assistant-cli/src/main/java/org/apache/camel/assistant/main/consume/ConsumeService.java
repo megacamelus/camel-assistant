@@ -32,14 +32,21 @@ public interface ConsumeService {
     @POST
     @Produces({MediaType.TEXT_PLAIN})
     @Consumes({MediaType.TEXT_PLAIN})
-    @Path("/dynamic/{source}/{id}")
-    String consumeDynamic(@PathParam("source") String source, @PathParam("id") String id, String data);
+    @Path("/text/dynamic/{source}/{id}")
+    String consumeTextDynamic(@PathParam("source") String source, @PathParam("id") String id, String data);
 
 
     @POST
     @Produces({MediaType.TEXT_PLAIN})
     @Consumes({MediaType.TEXT_PLAIN})
-    @Path("/static/")
-    String consumeStatic(String data);
+    @Path("/text/static/")
+    String consumeTextStatic(String data);
+
+
+    @POST
+    @Produces({MediaType.TEXT_PLAIN})
+    @Consumes({MediaType.APPLICATION_OCTET_STREAM})
+    @Path("/pdf/static/")
+    String consumePdfStatic(byte[] data);
 
 }
