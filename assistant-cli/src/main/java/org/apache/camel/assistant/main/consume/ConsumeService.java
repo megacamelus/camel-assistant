@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.camel.assistant.main.learn;
-
-import java.util.Set;
+package org.apache.camel.assistant.main.consume;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -29,19 +27,19 @@ import jakarta.ws.rs.core.MediaType;
 // api/consume/dynamic/cli.org/1
 
 @Path("/api/consume")
-public interface LearnService {
+public interface ConsumeService {
 
     @POST
     @Produces({MediaType.TEXT_PLAIN})
     @Consumes({MediaType.TEXT_PLAIN})
     @Path("/dynamic/{source}/{id}")
-    String learnDynamic(@PathParam("source") String source, @PathParam("id") String id, String data);
+    String consumeDynamic(@PathParam("source") String source, @PathParam("id") String id, String data);
 
 
     @POST
     @Produces({MediaType.TEXT_PLAIN})
     @Consumes({MediaType.TEXT_PLAIN})
     @Path("/static/")
-    String learnStatic(String data);
+    String consumeStatic(String data);
 
 }

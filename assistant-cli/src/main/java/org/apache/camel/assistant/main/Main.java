@@ -17,14 +17,12 @@
 
 package org.apache.camel.assistant.main;
 
-import java.util.concurrent.Callable;
-
 import io.quarkus.picocli.runtime.annotations.TopCommand;
-import org.apache.camel.assistant.main.command.Learn;
+import org.apache.camel.assistant.main.command.Consume;
 import picocli.CommandLine;
 
 @TopCommand
-@CommandLine.Command(name = "camel-assistant", subcommands = { Learn.class})
+@CommandLine.Command(name = "camel-assistant", subcommands = { Consume.class})
 public class Main implements Runnable {
 
     private static CommandLine commandLine;

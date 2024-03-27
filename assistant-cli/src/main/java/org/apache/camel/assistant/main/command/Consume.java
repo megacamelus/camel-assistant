@@ -20,12 +20,12 @@ package org.apache.camel.assistant.main.command;
 import java.net.URI;
 
 import io.quarkus.rest.client.reactive.QuarkusRestClientBuilder;
-import org.apache.camel.assistant.main.learn.LearnService;
+import org.apache.camel.assistant.main.consume.ConsumeService;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "learn",
-        description = "Learn a new dynamic or static knowledge", sortOptions = false)
-public class Learn extends BaseCommand {
+@CommandLine.Command(name = "Consume",
+        description = "Consume a new dynamic or static knowledge", sortOptions = false)
+public class Consume extends BaseCommand {
 
     @CommandLine.Option(names = {"-d", "--dynamic"}, description = "Whether it is using static or dynamic information")
     private boolean dynamic;
@@ -39,18 +39,18 @@ public class Learn extends BaseCommand {
     @CommandLine.Option(names = {"--data"}, description = "The data to load", arity = "0..1", required = true)
     private String data;
 
-    LearnService learnService;
+    ConsumeService learnService;
 
     @Override
     public void run() {
         learnService = QuarkusRestClientBuilder.newBuilder()
                 .baseUri(URI.create("http://localhost:8083"))
-                .build(LearnService.class);
+                .build(ConsumeService.class);
 
         if (dynamic) {
-            learnService.learnDynamic(source, id, data);
+            learnService.consumeDynamic(source, id, data);
         } else {
-            learnService.learnStatic(data);
+            learnService.consumeStatic(data);
         }
 
 

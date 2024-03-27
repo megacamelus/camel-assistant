@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.camel.assistant.main.learn;
+package org.apache.camel.assistant.main.consume;
 
-public class LearnModel {
+public class ConsumeModel {
     public String sourceId;
     public String sourceName;
     public String data;
