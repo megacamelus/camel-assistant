@@ -41,12 +41,14 @@ public class ConsumeFile extends BaseCommand {
     @CommandLine.Option(names = {"--id"}, description = "The ID of the information from the source", arity = "0..1")
     private String id;
 
-    // TODO: needs to support more than one file per invocation
     @CommandLine.Parameters(description = "The file to load", arity = "1..1")
     private String file;
 
     @CommandLine.Option(names = {"--address"}, description = "The service address", arity = "0..1", required = true, defaultValue = "http://localhost:8083")
     private String address;
+
+    @CommandLine.Option(names = {"--remove-pages"}, description = "An optional list of pages to remove (in the format N-N,N - ex.: 1-2,4)", arity = "0..1")
+    private String removePages;
 
     ConsumeService learnService;
 
@@ -59,7 +61,7 @@ public class ConsumeFile extends BaseCommand {
         try (InputStream stream = new BufferedInputStream(new FileInputStream(file))) {
             final byte[] pdfBytes = stream.readAllBytes();
 
-            learnService.consumePdfStatic(pdfBytes);
+            learnService.consumePdfStatic(removePages, pdfBytes);
         } catch (FileNotFoundException e) {
             System.err.printf("Cannot process file %s: file does not exist%n", file);
             System.exit(1);

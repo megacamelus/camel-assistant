@@ -18,10 +18,12 @@
 package org.apache.camel.assistant.main.consume;
 
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
 // api/consume/dynamic/cli.org/1
@@ -47,6 +49,6 @@ public interface ConsumeService {
     @Produces({MediaType.TEXT_PLAIN})
     @Consumes({MediaType.APPLICATION_OCTET_STREAM})
     @Path("/pdf/static/")
-    String consumePdfStatic(byte[] data);
+    String consumePdfStatic(@QueryParam("remove-pages") String removePages, byte[] data);
 
 }
