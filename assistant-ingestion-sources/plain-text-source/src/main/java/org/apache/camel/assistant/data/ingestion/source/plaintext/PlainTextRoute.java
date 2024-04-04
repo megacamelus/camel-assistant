@@ -18,15 +18,22 @@
 package org.apache.camel.assistant.data.ingestion.source.plaintext;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import io.quarkus.arc.Unremovable;
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jboss.logging.Logger;
 
+
+@ApplicationScoped
+@Unremovable
 public class PlainTextRoute extends RouteBuilder {
     private static final Logger LOG = Logger.getLogger(PlainTextRoute.class);
 
@@ -41,7 +48,10 @@ public class PlainTextRoute extends RouteBuilder {
     // they can accept. Typically this is 4096 ...
     // but given the context, question and everything else, we
     // use a much lower number
-    private static final int MAX_TOKENS = 384;
+    private static final int MAX_TOKENS = 128;
+
+    @Inject
+    CamelContext context;
 
     private void filter(Exchange exchange) {
         String unfilteredData = exchange.getMessage().getBody(String.class);
@@ -55,39 +65,41 @@ public class PlainTextRoute extends RouteBuilder {
         // TODO: Camel should probably do this itself
         PDDocument document = Loader.loadPDF(body);
 
+        // TODO: make it configurable
+        document.removePage(1);
+        document.removePage(2);
+        document.removePage(3);
+        document.removePage(4);
+        document.removePage(5);
+
+
         e.getMessage().setHeader(DATA_SIZE, body.length);
         e.getMessage().setBody(document);
     }
 
-    public static class CustomSplitter {
-        // TODO: this is very heavy and slow ... optimize this. Also, this is very
-        //  poor at providing context.
+    // Naive chunking ...
+    private void chunkProcessor(Exchange exchange) {
+        final String body = exchange.getMessage().getBody(String.class);
+        final String[] parts = body.split(" ");
+        final ProducerTemplate producerTemplate = context.createProducerTemplate();
 
-        public List<String> largeDataSplitter(Exchange exchange) {
-            final String body = exchange.getMessage().getBody(String.class);
-            final String[] parts = body.split(" ");
+        for (int i = 0; i < parts.length; i++) {
+            StringBuilder sb = new StringBuilder();
 
-            List<String> strings = new ArrayList<>();
+            int r = 0;
+            for (; r < MAX_TOKENS && r + i < parts.length && sb.length() < MAX_DATA_SIZE; r++) {
+                sb.append(parts[i + r]);
+                sb.append(" ");
+            }
+            i += r;
 
-            for (int i = 0; i < parts.length; i++) {
-                StringBuffer sb = new StringBuffer();
-
-                int r = 0;
-                for (; r < MAX_TOKENS && r + i < parts.length && sb.length() < MAX_DATA_SIZE; r++) {
-                    sb.append(parts[i + r]);
-                    sb.append(" ");
-                }
-                i += r;
-
-                strings.add(sb.toString());
+            if (i < parts.length) {
+                i -= 10;
             }
 
-            LOG.infof("Finished splitting: %d parts", strings.size());
-            return strings;
+            producerTemplate.sendBody("kafka:ingestion?brokers={{bootstrap.servers}}", sb.toString());
         }
     }
-
-
 
     @Override
     public void configure() throws Exception {
@@ -108,8 +120,7 @@ public class PlainTextRoute extends RouteBuilder {
                 .pipeline()
                     .to("pdf:extractText")
                     .process(this::filter)
-                    .split(method(new CustomSplitter(), "largeDataSplitter")).streaming()
-                    .to("kafka:ingestion?brokers={{bootstrap.servers}}");
+                    .process(this::chunkProcessor);
 
         from("direct:consumeTextDynamic")
                 .routeId("source-consume-text-dynamic-route")
