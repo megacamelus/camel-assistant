@@ -18,6 +18,9 @@
 package org.apache.camel.assistant.data.ingestion.source.plaintext;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -65,16 +68,40 @@ public class PlainTextRoute extends RouteBuilder {
         // TODO: Camel should probably do this itself
         PDDocument document = Loader.loadPDF(body);
 
-        // TODO: make it configurable
-        document.removePage(1);
-        document.removePage(2);
-        document.removePage(3);
-        document.removePage(4);
-        document.removePage(5);
+        String removePages = e.getMessage().getHeader("remove-pages", String.class);
+        LOG.infof("Removing pages %s", removePages);
 
+        final List<Integer> pagesToRemove = getPagesToRemove(removePages);
+
+        pagesToRemove.sort(Collections.reverseOrder());
+        for (int page : pagesToRemove) {
+            LOG.infof("Removing page %d", page);
+            document.removePage(page);
+        }
 
         e.getMessage().setHeader(DATA_SIZE, body.length);
         e.getMessage().setBody(document);
+    }
+
+    private static List<Integer> getPagesToRemove(String removePages) {
+        String[] ranges = removePages.split(",");
+        List<Integer> pagesToRemove = new ArrayList<>();
+        for (String range : ranges) {
+            if (range.contains("-")) {
+                String[] pages = range.split("-");
+                int initialPage = Integer.parseInt(pages[0]);
+                int endPage = Integer.parseInt(pages[1]);
+
+                for (int i = initialPage; i < endPage; i++) {
+                    pagesToRemove.add(i - 1);
+                }
+            } else {
+                int page = Integer.parseInt(range);
+
+                pagesToRemove.add(page - 1);
+            }
+        }
+        return pagesToRemove;
     }
 
     // Naive chunking ...
