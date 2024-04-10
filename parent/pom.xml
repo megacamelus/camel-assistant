@@ -56,7 +56,7 @@
 
         <camel-quarkus.platform.group-id>${quarkus.platform.group-id}</camel-quarkus.platform.group-id>
         <camel-quarkus.platform.artifact-id>quarkus-camel-bom</camel-quarkus.platform.artifact-id>
-        <camel-quarkus.platform.version>${quarkus.platform.version}</camel-quarkus.platform.version>
+        <camel-quarkus.platform.version>3.9.3</camel-quarkus.platform.version>
 
         <langchain4j.version>0.29.1</langchain4j.version>
         <picocli.version>4.7.5</picocli.version>
