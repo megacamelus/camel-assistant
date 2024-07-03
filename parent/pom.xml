@@ -52,7 +52,7 @@
 
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.9.4</quarkus.platform.version>
+        <quarkus.platform.version>3.12.1</quarkus.platform.version>
 
         <camel-quarkus.platform.group-id>${quarkus.platform.group-id}</camel-quarkus.platform.group-id>
         <camel-quarkus.platform.artifact-id>quarkus-camel-bom</camel-quarkus.platform.artifact-id>
@@ -63,9 +63,8 @@
         <vaadin.version>24.3.9</vaadin.version>
 
         <camel.version>4.6.0</camel.version>
-        <camel-k-runtime.version>3.8.0-SNAPSHOT</camel-k-runtime.version>
 
-        <quarkus.langchain.version>0.10.4</quarkus.langchain.version>
+        <quarkus.langchain.version>0.15.1</quarkus.langchain.version>
 
         <quarkus.container-image.registry>quay.io</quarkus.container-image.registry>
         <quarkus.container-image.group>megacamelus</quarkus.container-image.group>

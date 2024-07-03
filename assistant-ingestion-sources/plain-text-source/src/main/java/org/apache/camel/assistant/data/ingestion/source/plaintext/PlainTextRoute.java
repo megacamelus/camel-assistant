@@ -131,7 +131,7 @@ public class PlainTextRoute extends RouteBuilder {
     }
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         rest("/api")
                 .get("/hello").to("direct:hello")
                 .post("/consume/text/static").to("direct:consumeTextStatic")
@@ -153,12 +153,14 @@ public class PlainTextRoute extends RouteBuilder {
 
         from("direct:consumeTextDynamic")
                 .routeId("source-consume-text-dynamic-route")
+                .log("Received ${body}")
                 .setHeader("dynamic", constant("true"))
                 .to("kafka:ingestion?brokers={{bootstrap.servers}}")
                 .transform().constant("Dynamic data loaded");
 
         from("direct:consumeTextStatic")
                 .routeId("source-consume-text-static-route")
+                .log("Received ${body}")
                 .to("kafka:ingestion?brokers={{bootstrap.servers}}")
                 .transform().constant("Static data loaded");
     }
