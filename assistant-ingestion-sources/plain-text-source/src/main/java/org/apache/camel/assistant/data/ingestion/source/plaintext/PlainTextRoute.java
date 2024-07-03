@@ -69,14 +69,16 @@ public class PlainTextRoute extends RouteBuilder {
         PDDocument document = Loader.loadPDF(body);
 
         String removePages = e.getMessage().getHeader("remove-pages", String.class);
-        LOG.infof("Removing pages %s", removePages);
+        if (removePages != null) {
+            LOG.infof("Removing pages %s", removePages);
 
-        final List<Integer> pagesToRemove = getPagesToRemove(removePages);
+            final List<Integer> pagesToRemove = getPagesToRemove(removePages);
 
-        pagesToRemove.sort(Collections.reverseOrder());
-        for (int page : pagesToRemove) {
-            LOG.infof("Removing page %d", page);
-            document.removePage(page);
+            pagesToRemove.sort(Collections.reverseOrder());
+            for (int page : pagesToRemove) {
+                LOG.infof("Removing page %d", page);
+                document.removePage(page);
+            }
         }
 
         e.getMessage().setHeader(DATA_SIZE, body.length);
