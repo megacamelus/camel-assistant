@@ -64,7 +64,7 @@
 
         <camel.version>4.6.0</camel.version>
 
-        <quarkus.langchain.version>0.15.1</quarkus.langchain.version>
+        <quarkus.langchain.version>0.16.0</quarkus.langchain.version>
 
         <quarkus.container-image.registry>quay.io</quarkus.container-image.registry>
         <quarkus.container-image.group>megacamelus</quarkus.container-image.group>
