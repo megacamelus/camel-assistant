@@ -18,8 +18,10 @@
 package org.apache.camel.assistant.data.ingestion.sink.routes;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import io.quarkus.arc.Unremovable;
+import org.apache.camel.assistant.data.ingestion.common.IngestionSinkConfiguration;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.qdrant.Qdrant;
 import org.apache.camel.component.qdrant.QdrantAction;
@@ -29,13 +31,16 @@ import org.apache.camel.spi.DataType;
 @Unremovable
 public class KafkaToQdrantRoute extends RouteBuilder {
 
+    @Inject
+    IngestionSinkConfiguration configuration;
+
     @Override
     public void configure() {
-        from("kafka:ingestion?brokers={{bootstrap.servers}}")
+        fromF("kafka:ingestion")
                 .process("collectionProcessorBean")
-                .to("langchain4j-embeddings:{{langchain.embedding.id}}")
+                .toF("langchain4j-embeddings:%s", configuration.langChain4jEmbeddings().embeddingId())
                 .setHeader(Qdrant.Headers.ACTION).constant(QdrantAction.UPSERT)
                 .transform(new DataType("qdrant:embeddings"))
-                .to("qdrant:{{qdrant.collection}}?host={{qdrant.host}}&port={{qdrant.port}}");
+                .toF("qdrant:%s", configuration.qdrant().collection().name());
     }
 }

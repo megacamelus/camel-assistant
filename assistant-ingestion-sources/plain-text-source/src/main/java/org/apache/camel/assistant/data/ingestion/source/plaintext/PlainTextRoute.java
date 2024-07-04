@@ -126,7 +126,7 @@ public class PlainTextRoute extends RouteBuilder {
                 i -= 10;
             }
 
-            producerTemplate.sendBody("kafka:ingestion?brokers={{bootstrap.servers}}", sb.toString());
+            producerTemplate.sendBody("kafka:ingestion", sb.toString());
         }
     }
 
@@ -155,13 +155,13 @@ public class PlainTextRoute extends RouteBuilder {
                 .routeId("source-consume-text-dynamic-route")
                 .log("Received ${body}")
                 .setHeader("dynamic", constant("true"))
-                .to("kafka:ingestion?brokers={{bootstrap.servers}}")
+                .to("kafka:ingestion")
                 .transform().constant("Dynamic data loaded");
 
         from("direct:consumeTextStatic")
                 .routeId("source-consume-text-static-route")
                 .log("Received ${body}")
-                .to("kafka:ingestion?brokers={{bootstrap.servers}}")
+                .to("kafka:ingestion")
                 .transform().constant("Static data loaded");
     }
 }
