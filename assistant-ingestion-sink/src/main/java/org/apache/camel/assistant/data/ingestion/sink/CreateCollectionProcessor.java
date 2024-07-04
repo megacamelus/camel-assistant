@@ -33,6 +33,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.qdrant.Qdrant;
 import org.apache.camel.component.qdrant.QdrantAction;
 import org.apache.camel.component.qdrant.QdrantActionException;
+import org.apache.camel.assistant.data.ingestion.common.IngestionSinkConfiguration;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -44,8 +45,8 @@ public class CreateCollectionProcessor implements Processor {
     @Inject
     CamelContext context;
 
-    // TODO: make configurable
-    private int size = 384;
+    @Inject
+    IngestionSinkConfiguration configuration;
 
     @Override
     public void process(Exchange exchange) {
@@ -53,7 +54,7 @@ public class CreateCollectionProcessor implements Processor {
         final ProducerTemplate producerTemplate = context.createProducerTemplate();
 
         try {
-            producerTemplate.sendBodyAndHeader("qdrant:{{qdrant.collection}}",
+            producerTemplate.sendBodyAndHeader("qdrant:" + configuration.qdrant().collection().name(),
                     null, Qdrant.Headers.ACTION,
                     QdrantAction.COLLECTION_INFO);
 
@@ -84,8 +85,8 @@ public class CreateCollectionProcessor implements Processor {
         LOG.infof("Trying to create the collection in case it does not exist.");
 
         try {
-            producerTemplate.requestBodyAndHeader("qdrant:{{qdrant.collection}}",
-                    Collections.VectorParams.newBuilder().setDistance(Collections.Distance.Cosine).setSize(size)
+            producerTemplate.requestBodyAndHeader("qdrant:" + configuration.qdrant().collection().name(),
+                    Collections.VectorParams.newBuilder().setDistance(Collections.Distance.Cosine).setSize(configuration.qdrant().size())
                             .build(),
                     Qdrant.Headers.ACTION,
                     QdrantAction.CREATE_COLLECTION);

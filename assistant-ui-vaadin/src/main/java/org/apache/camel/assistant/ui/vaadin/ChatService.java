@@ -10,26 +10,27 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+
+import org.apache.camel.assistant.ui.common.UiConfiguration;
+import org.jboss.logging.Logger;
 
 @Dependent
 public class ChatService {
+    private static final Logger LOG = Logger.getLogger(ChatService.class);
 
-    @ConfigProperty(name = "assistant-backend.url")
-    String apiURL;
-
-    @ConfigProperty(name = "assistant-backend.timeout.seconds")
-    long timeout;
+    @Inject
+    UiConfiguration configuration;
 
     public String send(String message) throws URISyntaxException, IOException, InterruptedException {
+        LOG.infof("Sending a message to %s", configuration.backend().url());
         HttpClient client = HttpClient.newHttpClient();
         
         HttpRequest request = HttpRequest.newBuilder()
-        .uri(new URI(apiURL))
+        .uri(new URI(configuration.backend().url()))
         .headers("Content-Type", "text/plain;charset=UTF-8")
-        .timeout(Duration.of(timeout, ChronoUnit.SECONDS))
+        .timeout(Duration.of(configuration.backend().timeout(), ChronoUnit.SECONDS))
         .POST(HttpRequest.BodyPublishers.ofString(message))
         .build();
 
