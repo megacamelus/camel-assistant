@@ -60,7 +60,7 @@
 
         <langchain4j.version>0.32.0</langchain4j.version>
         <picocli.version>4.7.5</picocli.version>
-        <vaadin.version>24.4.4</vaadin.version>
+        <vaadin.version>24.4.5</vaadin.version>
 
         <camel.version>4.6.0</camel.version>
 
