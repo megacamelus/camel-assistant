@@ -10,8 +10,8 @@ public interface UiConfiguration {
 
     interface Backend {
 
-        @WithDefault("http://localhost:8080/api/hello")
-        String url();
+        @WithDefault("http://localhost:8080")
+        String baseUrl();
 
         @WithDefault("100")
         int timeout();
