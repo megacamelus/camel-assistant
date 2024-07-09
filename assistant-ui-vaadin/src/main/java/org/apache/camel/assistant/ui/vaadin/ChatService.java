@@ -24,11 +24,13 @@ public class ChatService {
     UiConfiguration configuration;
 
     public String send(String message) throws URISyntaxException, IOException, InterruptedException {
-        LOG.infof("Sending a message to %s", configuration.backend().baseUrl());
+        final String target = configuration.backend().baseUrl() + ServiceConstants.CHAT_API_PATH;
+
+        LOG.infof("Sending a message to %s", target);
         HttpClient client = HttpClient.newHttpClient();
         
         HttpRequest request = HttpRequest.newBuilder()
-        .uri(new URI(configuration.backend().baseUrl() + ServiceConstants.CHAT_API_PATH))
+        .uri(new URI(target))
         .headers("Content-Type", "text/plain;charset=UTF-8")
         .timeout(Duration.of(configuration.backend().timeout(), ChronoUnit.SECONDS))
         .POST(HttpRequest.BodyPublishers.ofString(message))
