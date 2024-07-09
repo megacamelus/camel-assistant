@@ -24,16 +24,16 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
 
-@Path("/api")
+@Path("/api/v1/assistant")
 public class AssistantWebResource {
 
     @Inject
     CamelAssistant camelAssistant;
 
-    @Path("/hello")
+    @Path("/chat")
     @POST
     @Produces(MediaType.TEXT_PLAIN)
-    public String hello(String question){
+    public String chat(String question){
         return camelAssistant.assist(question);
     }
 

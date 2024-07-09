@@ -18,5 +18,5 @@
 package org.apache.camel.assistant.ui.vaadin;
 
 public final class ServiceConstants {
-    public static final String CHAT_API_PATH = "/api/hello";
+    public static final String CHAT_API_PATH = "/api/v1/assistant/chat";
 }
