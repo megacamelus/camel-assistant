@@ -93,4 +93,4 @@ services:
     ports:
       - "8081:8081"
     environment:
-      BACKEND_URL: "http://backend:8080/api/hello"
+      BACKEND_HOST: "http://backend:8080"
