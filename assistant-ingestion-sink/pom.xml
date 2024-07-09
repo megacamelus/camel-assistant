@@ -138,4 +138,13 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>OpenAI</id>
+      <properties>
+        <quarkus.langchain4j.chat-model.provider>openai</quarkus.langchain4j.chat-model.provider>
+      </properties>
+    </profile>
+  </profiles>
+
 </project>

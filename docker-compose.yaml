@@ -46,13 +46,12 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-# TODO: unsupported for now (probably only works on Linux / also very slow)
-#  ollama:
-#    image: ollama/ollama
-#    ports:
-#      - "8000:8000"
-#    environment:
-#      OLLAMA_HOST: ":8000"
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "8000:8000"
+    environment:
+      OLLAMA_HOST: ":8000"
   qdrant:
     image: qdrant/qdrant:v1.9.7-unprivileged
     ports:
@@ -66,15 +65,18 @@ services:
     ports:
       - "8080:8080"
     environment:
-      QUARKUS_PROFILE: "compose"
-      # Set this to the URL of your API endpoint
-      #_COMPOSE_QUARKUS_LANGCHAIN4J_OPENAI_BASE_URL: http://configureme:49090/v1
+      API_ENDPOINT: "http://ollama:8000/"
+      API_TIMEOUT: "110s"
+      QDRANT_HOST: "qdrant"
+      #      If you are on Linux with good resources, you may try different models. For mac, anything else times out
+      CHAT_MODEL: "orca-mini"
   ingestion-sink:
     image: quay.io/megacamelus/assistant-ingestion-sink
     depends_on:
       - kafka
     environment:
-      QUARKUS_PROFILE: "compose"
+      KAFKA_BROKERS: "kafka:9092"
+      QDRANT_HOST: "qdrant"
   ingestion-source-plain-text:
     image: quay.io/megacamelus/plain-text-source
     depends_on:
@@ -83,7 +85,7 @@ services:
     ports:
       - "8083:8083"
     environment:
-      QUARKUS_PROFILE: "compose"
+      KAFKA_BROKERS: "kafka:9092"
   ui:
     image: quay.io/megacamelus/assistant-ui-vaadin
     depends_on:
@@ -91,4 +93,4 @@ services:
     ports:
       - "8081:8081"
     environment:
-      QUARKUS_PROFILE: "compose"
+      BACKEND_URL: "http://backend:8080/api/hello"
