@@ -19,7 +19,7 @@ package org.apache.camel.assistant.main.command;
 
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "consume", subcommands = { ConsumeData.class, ConsumeFile.class})
+@CommandLine.Command(name = "consume", subcommands = { ConsumeData.class, ConsumeFile.class, ConsumeDataSet.class})
 public class Consume extends BaseCommand {
     @Override
     public void run() {

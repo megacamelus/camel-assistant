@@ -26,23 +26,9 @@ docker-compose up
 podman exec -it camel-assistant-ollama-1 ollama pull orca-mini
 ```
 
-NOTE: this may take a while, as it needs to download about 2Gb of data from HuggingFace. 
+NOTE: this may take a while, as it needs to download about 2Gb of data from HuggingFace.
 
-5. While the model is downloading, use the time to load some data into the QDrant DB
-
-```shell
-cd assistant-cli && java -jar target/quarkus-app/quarkus-run.jar consume file /path/to/red_hat_build_of_apache_camel-4.0-tooling_guide-en-us.pdf
-```
-NOTE: you can download some PDFs from [here](https://github.com/megacamelus/cai/tree/main/docs).
-
-6. Wait a few seconds and check if the data is available in the Qdrant DB
-
-```shell
-curl -X POST http://localhost:6333/collections/camel/points/scroll -H "Content-Type: application/json" -d "{\"limit\": 50 }" | jq .
-```
-
-7. Access the [web UI](http://localhost:8081/) and ask a question. Depending on your hardware, the reply may take up to 100 seconds.
-Additionally, trying the assistant using docker compose on Mac is very slow, as the inference runs purely on CPU. 
+5. Proceed to the Loading Data section for details about how to load data
 
 ## Trying it manually
 
@@ -99,3 +85,46 @@ KAFKA_BROKERS=kafka-host:9092 java -jar ./assistant-backend/target/quarkus-app/q
 ```shell
 java -jar assistant-ui-vaadin/target/quarkus-app/quarkus-run.jar
 ```
+
+# Loading Data 
+
+## Loading PDFs
+
+To load PDF data (such as those from documentation, books, etc) into the QDrant DB, use the command:
+
+```shell
+cd assistant-cli && java -jar target/quarkus-app/quarkus-run.jar consume file /path/to/red_hat_build_of_apache_camel-4.0-tooling_guide-en-us.pdf
+```
+NOTE: you can download some PDFs from [here](https://github.com/megacamelus/cai/tree/main/docs).
+
+## Loading Datasets 
+
+You can load data from the [Camel Dataset](https://huggingface.co/megacamelus). 
+
+To download the dataset for data formats:
+
+```shell
+huggingface-cli download --repo-type dataset --local-dir camel-dataformats megacamelus/camel-dataformats
+```
+
+To download the dataset for components:
+
+```shell
+huggingface-cli download --repo-type dataset --local-dir camel-components megacamelus/camel-components
+```
+
+Use this command to load the dataset into the DB:
+
+```shell
+java -jar target/quarkus-app/quarkus-run.jar consume dataset --path ~/code/datasets/dataset/ --source org.apache.camel
+```
+
+## Checking if the data was loaded
+
+Wait a few seconds after running the load command, and then check if the data is available in the Qdrant DB:
+
+```shell
+curl -X POST http://localhost:6333/collections/camel/points/scroll -H "Content-Type: application/json" -d "{\"limit\": 50 }" | jq .
+```
+
+
