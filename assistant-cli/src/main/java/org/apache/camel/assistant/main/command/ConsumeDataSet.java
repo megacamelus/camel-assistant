@@ -77,9 +77,9 @@ public class ConsumeDataSet extends BaseCommand {
                         learnService.consumeTextStatic(record.getOutput());
                     }
                 } catch (FileNotFoundException e) {
-                    System.err.printf("File %s not found%n [Skipping]", file);
+                    System.err.printf("File %s not found [Skipping]%n", file);
                 } catch (IOException e) {
-                    System.err.printf("Unhandled I/O error '%s' processing %s%n [Skipping]", e.getMessage(), file);
+                    System.err.printf("Unhandled I/O error '%s' processing %s [Skipping]%n", e.getMessage(), file);
                 }
             }
         }
