@@ -57,8 +57,15 @@ public class ConsumeDataSet extends BaseCommand {
 
         File datasetDir = new File(path);
         if (datasetDir.isDirectory()) {
-            for (File file : datasetDir.listFiles()) {
-                System.err.printf("Loading dataset file %s%n", file);
+            final File[] files = datasetDir.listFiles();
+            if (files == null) {
+                System.out.println("There are no files in " + datasetDir.getAbsolutePath());
+                return;
+            }
+
+            for (int i = 0; i < files.length; i++) {
+                final File file = files[i];
+                System.err.printf("Loading dataset file %d of %d %s%n", i, files.length, file);
                 try (InputStream stream = new BufferedInputStream(new FileInputStream(file))) {
                     ObjectMapper mapper = new ObjectMapper();
                     final AlpacaRecord[] alpacaRecords = mapper.readValue(stream, AlpacaRecord[].class);
