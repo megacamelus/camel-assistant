@@ -65,6 +65,10 @@ public class ConsumeDataSet extends BaseCommand {
 
             for (int i = 0; i < files.length; i++) {
                 final File file = files[i];
+                if (!file.getName().endsWith(".json")) {
+                    System.err.printf("Skipping file %d of %d %s: it's not a dataset file%n", i, files.length, file);
+                }
+
                 System.err.printf("Loading dataset file %d of %d %s%n", i, files.length, file);
                 try (InputStream stream = new BufferedInputStream(new FileInputStream(file))) {
                     ObjectMapper mapper = new ObjectMapper();
