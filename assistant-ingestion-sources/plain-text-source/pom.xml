@@ -65,6 +65,7 @@
             <artifactId>camel-quarkus-rest</artifactId>
         </dependency>
 
+        <!-- for PDF consumption -->
         <dependency>
             <groupId>org.apache.camel.quarkus</groupId>
             <artifactId>camel-quarkus-pdf</artifactId>
@@ -85,8 +86,20 @@
             <artifactId>quarkus-container-image-jib</artifactId>
         </dependency>
 
-        <!-- for PDF consumption -->
+        <dependency>
+            <groupId>io.quarkiverse.langchain4j</groupId>
+            <artifactId>quarkus-langchain4j-core</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>io.quarkiverse.langchain4j</groupId>
+            <artifactId>quarkus-langchain4j-openai</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkiverse.langchain4j</groupId>
+            <artifactId>quarkus-langchain4j-ollama</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>

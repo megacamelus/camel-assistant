@@ -25,15 +25,18 @@ import java.util.List;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import dev.langchain4j.data.document.DocumentSplitter;
 import io.quarkus.arc.Unremovable;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.assistant.data.ingestion.source.common.IngestionSourceConfiguration;
+import org.apache.camel.assistant.data.ingestion.source.common.SplitterUtil;
+import org.apache.camel.assistant.data.ingestion.source.common.UserParams;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jboss.logging.Logger;
-
 
 @ApplicationScoped
 @Unremovable
@@ -42,25 +45,11 @@ public class PlainTextRoute extends RouteBuilder {
 
     private static final String DATA_SIZE = "DATA_SIZE";
 
-    // By default, Kafka won't accept payloads greater than 1048576,
-    // give the additional data that may transit, we limit it to a much
-    // lower value
-    private static final int MAX_DATA_SIZE = 1000000;
-
-    // AI APIs have an upper limit to the amount of tokens
-    // they can accept. Typically this is 4096 ...
-    // but given the context, question and everything else, we
-    // use a much lower number
-    private static final int MAX_TOKENS = 128;
-
     @Inject
     CamelContext context;
 
-    private void filter(Exchange exchange) {
-        String unfilteredData = exchange.getMessage().getBody(String.class);
-
-        exchange.getMessage().setBody(unfilteredData.replace('\n', ' '));
-    }
+    @Inject
+    IngestionSourceConfiguration configuration;
 
     private void convertBytesToPDFFile(Exchange e) throws IOException {
         final byte[] body = e.getMessage().getBody(byte[].class);
@@ -68,7 +57,7 @@ public class PlainTextRoute extends RouteBuilder {
         // TODO: Camel should probably do this itself
         PDDocument document = Loader.loadPDF(body);
 
-        String removePages = e.getMessage().getHeader("remove-pages", String.class);
+        String removePages = e.getMessage().getHeader(UserParams.REMOVE_PAGES, String.class);
         if (removePages != null) {
             LOG.infof("Removing pages %s", removePages);
 
@@ -106,27 +95,15 @@ public class PlainTextRoute extends RouteBuilder {
         return pagesToRemove;
     }
 
-    // Naive chunking ...
     private void chunkProcessor(Exchange exchange) {
         final String body = exchange.getMessage().getBody(String.class);
-        final String[] parts = body.split(" ");
         final ProducerTemplate producerTemplate = context.createProducerTemplate();
 
+        final DocumentSplitter splitter = SplitterUtil.createDocumentSplitter(exchange, configuration);
+        final String[] parts = SplitterUtil.split(splitter, body);
+
         for (int i = 0; i < parts.length; i++) {
-            StringBuilder sb = new StringBuilder();
-
-            int r = 0;
-            for (; r < MAX_TOKENS && r + i < parts.length && sb.length() < MAX_DATA_SIZE; r++) {
-                sb.append(parts[i + r]);
-                sb.append(" ");
-            }
-            i += r;
-
-            if (i < parts.length) {
-                i -= 10;
-            }
-
-            producerTemplate.sendBody("kafka:ingestion", sb.toString());
+            producerTemplate.sendBody("kafka:ingestion", parts[i]);
         }
     }
 
@@ -148,7 +125,6 @@ public class PlainTextRoute extends RouteBuilder {
                 .process(this::convertBytesToPDFFile)
                 .pipeline()
                     .to("pdf:extractText")
-                    .process(this::filter)
                     .process(this::chunkProcessor);
 
         from("direct:consumeTextDynamic")
