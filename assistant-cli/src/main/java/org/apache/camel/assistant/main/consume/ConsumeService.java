@@ -49,6 +49,6 @@ public interface ConsumeService {
     @Produces({MediaType.TEXT_PLAIN})
     @Consumes({MediaType.APPLICATION_OCTET_STREAM})
     @Path("/pdf/static/")
-    String consumePdfStatic(@QueryParam("remove-pages") String removePages, byte[] data);
+    String consumePdfStatic(@QueryParam("remove-pages") String removePages, @QueryParam("splitter-name") String splitterName, byte[] data);
 
 }

@@ -50,18 +50,21 @@ public class ConsumeFile extends BaseCommand {
     @CommandLine.Option(names = {"--remove-pages"}, description = "An optional list of pages to remove (in the format N-N,N - ex.: 1-2,4)", arity = "0..1")
     private String removePages;
 
-    ConsumeService learnService;
+    @CommandLine.Option(names = {"--splitter-name"}, description = "To use an specific document splitter (overrides the server one)", arity = "0..1")
+    private String splitterName;
+
+    ConsumeService consumeService;
 
     @Override
     public void run() {
-        learnService = QuarkusRestClientBuilder.newBuilder()
+        consumeService = QuarkusRestClientBuilder.newBuilder()
                 .baseUri(URI.create(address))
                 .build(ConsumeService.class);
 
         try (InputStream stream = new BufferedInputStream(new FileInputStream(file))) {
             final byte[] pdfBytes = stream.readAllBytes();
 
-            learnService.consumePdfStatic(removePages, pdfBytes);
+            consumeService.consumePdfStatic(removePages, splitterName, pdfBytes);
         } catch (FileNotFoundException e) {
             System.err.printf("Cannot process file %s: file does not exist%n", file);
             System.exit(1);
