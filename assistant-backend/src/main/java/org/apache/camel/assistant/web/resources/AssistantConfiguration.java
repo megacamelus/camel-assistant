@@ -8,6 +8,8 @@ public interface AssistantConfiguration {
 
     Qdrant qdrant();
 
+    Retriever retriever();
+
     interface Qdrant {
         Collection collection();
 
@@ -21,5 +23,13 @@ public interface AssistantConfiguration {
             @WithDefault("camel")
             String name();
         }
+    }
+
+    interface Retriever {
+        @WithDefault("3")
+        int maxResults();
+
+        @WithDefault("0.3")
+        double minScore();
     }
 }
