@@ -101,10 +101,13 @@ NOTE: you can download some PDFs from [here](https://github.com/megacamelus/cai/
 
 You can load data from the [Camel Dataset](https://huggingface.co/megacamelus). 
 
-To download the dataset for data formats:
+To download the dataset for data formats, components, EIPs and languages:
 
 ```shell
 huggingface-cli download --repo-type dataset --local-dir camel-dataformats megacamelus/camel-dataformats
+huggingface-cli download --repo-type dataset --local-dir camel-components megacamelus/camel-components
+huggingface-cli download --repo-type dataset --local-dir camel-eips megacamelus/camel-eips
+huggingface-cli download --repo-type dataset --local-dir camel-languages megacamelus/camel-languages
 ```
 
 To download the dataset for components:
@@ -116,7 +119,10 @@ huggingface-cli download --repo-type dataset --local-dir camel-components megaca
 Use this command to load the dataset into the DB:
 
 ```shell
-java -jar target/quarkus-app/quarkus-run.jar consume dataset --path ~/code/datasets/dataset/ --source org.apache.camel
+java -jar target/quarkus-app/quarkus-run.jar consume dataset --path ~/code/datasets/camel-dataformats/ --source org.apache.camel
+java -jar target/quarkus-app/quarkus-run.jar consume dataset --path ~/code/datasets/camel-components/ --source org.apache.camel
+java -jar target/quarkus-app/quarkus-run.jar consume dataset --path ~/code/datasets/camel-eips/ --source org.apache.camel
+java -jar target/quarkus-app/quarkus-run.jar consume dataset --path ~/code/datasets/camel-languages/ --source org.apache.camel
 ```
 
 ## Checking if the data was loaded
