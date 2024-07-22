@@ -1,4 +1,4 @@
-# camel-assistant
+# Camel Assistant
 
 ## Trying it using Docker Compose
 
@@ -133,4 +133,11 @@ Wait a few seconds after running the load command, and then check if the data is
 curl -X POST http://localhost:6333/collections/camel/points/scroll -H "Content-Type: application/json" -d "{\"limit\": 50 }" | jq .
 ```
 
+## Building 
+
+To build the containers locally: 
+
+```shell
+mvn clean package -Dquarkus.container-image.build=true
+```
 
