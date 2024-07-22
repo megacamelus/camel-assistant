@@ -52,7 +52,7 @@ mvn clean package
 2. Launch Qdrant:
 
 ```shell
-podman run -d --rm --name qdrant -p 6334:6334 -p 6333:6333 qdrant/qdrant:v1.9.7-unprivileged
+podman run -d --rm --name qdrant -p 6334:6334 -p 6333:6333 -v $(pwd)/qdrant_storage:/qdrant/storage:z qdrant/qdrant:v1.9.7-unprivileged
 ```
 
 3. Launch Ollama:
