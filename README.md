@@ -23,7 +23,7 @@ docker-compose up
 4. Wait for everything to be up and then pull the `orca-mini` model: 
 
 ```shell
-podman exec -it camel-assistant-ollama-1 ollama pull orca-mini
+podman exec -it camel-assistant_ollama_1 ollama pull orca-mini
 ```
 
 NOTE: this may take a while, as it needs to download about 2Gb of data from HuggingFace.
