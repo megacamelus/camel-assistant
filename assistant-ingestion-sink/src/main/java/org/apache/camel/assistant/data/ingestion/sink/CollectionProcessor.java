@@ -56,6 +56,7 @@ public class CollectionProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         Message message = exchange.getMessage();
 
+        LOG.debugf("Processing a new message for collection");
         logHeaders(message);
 
         boolean dynamic = message.getHeader(DYNAMIC, false, Boolean.class);
@@ -104,15 +105,19 @@ public class CollectionProcessor implements Processor {
     }
 
     private static void logHeaders(Message message) {
+        if (!LOG.isDebugEnabled()) {
+            return;
+        }
+
         var headers = message.getHeaders();
 
         for (var entry : headers.entrySet()) {
-            LOG.infof("Consuming header: %s = %s", entry.getKey(), entry.getValue());
+            LOG.debugf("Consuming header: %s = %s", entry.getKey(), entry.getValue());
         }
 
         Headers kafkaHeaders = message.getHeader(KafkaConstants.HEADERS, Headers.class);
         for (Header header : kafkaHeaders) {
-            LOG.infof("Consuming Kafka header: %s = %s", header.key(), new String(header.value()));
+            LOG.debugf("Consuming Kafka header: %s = %s", header.key(), new String(header.value()));
         }
     }
 }
