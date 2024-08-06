@@ -66,6 +66,8 @@ public class CollectionProcessor implements Processor {
 
             if (ObjectHelper.isEmpty(externalId) || ObjectHelper.isEmpty(externalSource)) {
                 // fail
+                LOG.errorf("Skipping handling dynamic data without an external ID or source");
+                return;
             }
 
             // Check if an internal ID exists on the DB
