@@ -18,7 +18,6 @@
 package org.apache.camel.assistant.main.consume;
 
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -51,4 +50,9 @@ public interface ConsumeService {
     @Path("/pdf/static/")
     String consumePdfStatic(@QueryParam("remove-pages") String removePages, @QueryParam("splitter-name") String splitterName, byte[] data);
 
+    @POST
+    @Produces({MediaType.TEXT_PLAIN})
+    @Consumes({MediaType.TEXT_PLAIN})
+    @Path("/file/static/")
+    String consumeFileStatic(@QueryParam("splitter-name") String splitterName, String data);
 }

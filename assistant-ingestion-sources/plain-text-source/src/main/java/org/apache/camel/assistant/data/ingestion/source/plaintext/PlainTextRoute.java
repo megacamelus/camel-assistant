@@ -113,7 +113,8 @@ public class PlainTextRoute extends RouteBuilder {
                 .get("/hello").to("direct:hello")
                 .post("/consume/text/static").to("direct:consumeTextStatic")
                 .post("/consume/text/dynamic/{source}/{id}").consumes("application/octet-stream").to("direct:consumeTextDynamic")
-                .post("/consume/pdf/static").to("direct:consumePdfStatic");
+                .post("/consume/pdf/static").to("direct:consumePdfStatic")
+                .post("/consume/file/static").to("direct:consumeFileStatic");
 
         from("direct:hello")
                 .routeId("source-web-hello")
@@ -126,6 +127,10 @@ public class PlainTextRoute extends RouteBuilder {
                 .pipeline()
                     .to("pdf:extractText")
                     .process(this::chunkProcessor);
+
+        from("direct:consumeFileStatic")
+                .routeId("source-consume-file-static-route")
+                .process(this::chunkProcessor);
 
         from("direct:consumeTextDynamic")
                 .routeId("source-consume-text-dynamic-route")

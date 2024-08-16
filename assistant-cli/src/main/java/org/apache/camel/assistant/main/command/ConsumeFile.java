@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.function.Consumer;
 
 import io.quarkus.rest.client.reactive.QuarkusRestClientBuilder;
 import org.apache.camel.assistant.main.consume.ConsumeService;
@@ -61,10 +62,28 @@ public class ConsumeFile extends BaseCommand {
                 .baseUri(URI.create(address))
                 .build(ConsumeService.class);
 
-        try (InputStream stream = new BufferedInputStream(new FileInputStream(file))) {
-            final byte[] pdfBytes = stream.readAllBytes();
+        if (file.endsWith(".pdf")) {
+            consumeFile(b -> consumePdf(b));
+        } else {
+            consumeFile(b -> consumeText(b));
+        }
+    }
 
-            consumeService.consumePdfStatic(removePages, splitterName, pdfBytes);
+    private void consumeText(byte[] data) {
+        final String content = new String(data);
+
+        consumeService.consumeFileStatic(splitterName, content);
+    }
+
+    private void consumePdf(byte[] data) {
+        consumeService.consumePdfStatic(removePages, splitterName, data);
+    }
+
+    private void consumeFile(Consumer<byte[]> consumer) {
+        try (InputStream stream = new BufferedInputStream(new FileInputStream(file))) {
+            final byte[] data = stream.readAllBytes();
+
+            consumer.accept(data);
         } catch (FileNotFoundException e) {
             System.err.printf("Cannot process file %s: file does not exist%n", file);
             System.exit(1);
