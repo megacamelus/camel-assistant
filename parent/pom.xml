@@ -52,19 +52,19 @@
 
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.13.2</quarkus.platform.version>
+        <quarkus.platform.version>3.15.1</quarkus.platform.version>
 
         <camel-quarkus.platform.group-id>${quarkus.platform.group-id}</camel-quarkus.platform.group-id>
         <camel-quarkus.platform.artifact-id>quarkus-camel-bom</camel-quarkus.platform.artifact-id>
         <camel-quarkus.platform.version>${quarkus.platform.version}</camel-quarkus.platform.version>
 
-        <langchain4j.version>0.32.0</langchain4j.version>
+        <langchain4j.version>0.35.0</langchain4j.version>
         <picocli.version>4.7.5</picocli.version>
         <vaadin.version>24.4.8</vaadin.version>
 
         <camel.version>4.6.0</camel.version>
 
-        <quarkus.langchain.version>0.16.4</quarkus.langchain.version>
+        <quarkus.langchain.version>0.19.0</quarkus.langchain.version>
 
         <quarkus.container-image.registry>quay.io</quarkus.container-image.registry>
         <quarkus.container-image.group>megacamelus</quarkus.container-image.group>
