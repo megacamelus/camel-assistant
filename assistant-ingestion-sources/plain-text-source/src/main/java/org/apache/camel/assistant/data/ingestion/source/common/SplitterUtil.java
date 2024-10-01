@@ -17,78 +17,52 @@
 
 package org.apache.camel.assistant.data.ingestion.source.common;
 
-import dev.langchain4j.data.document.DocumentSplitter;
-import dev.langchain4j.data.document.splitter.DocumentByCharacterSplitter;
-import dev.langchain4j.data.document.splitter.DocumentByLineSplitter;
-import dev.langchain4j.data.document.splitter.DocumentByParagraphSplitter;
-import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter;
-import dev.langchain4j.data.document.splitter.DocumentByWordSplitter;
-import dev.langchain4j.model.Tokenizer;
-import dev.langchain4j.model.openai.OpenAiTokenizer;
-import org.apache.camel.Exchange;
-import org.jboss.logging.Logger;
+import org.apache.camel.builder.TokenizerBuilderFactory;
+import org.apache.camel.model.tokenizer.LangChain4jTokenizerDefinition;
 
 public final class SplitterUtil {
-    private static final Logger LOG = Logger.getLogger(SplitterUtil.class);
 
-    public static DocumentSplitter fromConfiguration(IngestionSourceConfiguration configuration, Tokenizer tokenizer) {
+    public static LangChain4jTokenizerDefinition createTokenizer(TokenizerBuilderFactory tokenizerBuilderFactory, IngestionSourceConfiguration configuration) {
         final IngestionSourceConfiguration.Splitter splitterConf = configuration.splitter();
-        return byName(splitterConf.name(), splitterConf.maxTokens(), splitterConf.maxOverlap(), tokenizer);
-    }
+        final String name = splitterConf.name();
 
-    public static DocumentSplitter byName(String name, int maxTokens, int maxOverlap, Tokenizer tokenizer) {
-        LOG.infof("Creating a %s splitter", name);
         switch (name) {
             case "sentence" -> {
-                return new DocumentBySentenceSplitter(maxTokens, maxOverlap, tokenizer);
+                return tokenizerBuilderFactory.bySentence()
+                        .maxTokens(splitterConf.maxTokens())
+                        .maxOverlap(splitterConf.maxOverlap())
+                        .using(LangChain4jTokenizerDefinition.TokenizerType.valueOf(splitterConf.name()))
+                        .end();
             }
             case "paragraph" -> {
-                return new DocumentByParagraphSplitter(maxTokens, maxOverlap, tokenizer);
+                return tokenizerBuilderFactory.byParagraph()
+                        .maxTokens(splitterConf.maxTokens())
+                        .maxOverlap(splitterConf.maxOverlap())
+                        .using(LangChain4jTokenizerDefinition.TokenizerType.valueOf(configuration.tokenizer().name()))
+                        .end();
             }
             case "character" -> {
-                return new DocumentByCharacterSplitter(maxTokens, maxOverlap, tokenizer);
+                return tokenizerBuilderFactory.byCharacter()
+                        .maxTokens(splitterConf.maxTokens())
+                        .maxOverlap(splitterConf.maxOverlap())
+                        .using(LangChain4jTokenizerDefinition.TokenizerType.valueOf(configuration.tokenizer().name()))
+                        .end();
             }
             case "word" -> {
-                return new DocumentByWordSplitter(maxTokens, maxOverlap, tokenizer);
+                return tokenizerBuilderFactory.byWord()
+                        .maxTokens(splitterConf.maxTokens())
+                        .maxOverlap(splitterConf.maxOverlap())
+                        .using(LangChain4jTokenizerDefinition.TokenizerType.valueOf(configuration.tokenizer().name()))
+                        .end();
             }
             case "line" -> {
-                return new DocumentByLineSplitter(maxTokens, maxOverlap, tokenizer);
+                return tokenizerBuilderFactory.byLine()
+                        .maxTokens(splitterConf.maxTokens())
+                        .maxOverlap(splitterConf.maxOverlap())
+                        .using(LangChain4jTokenizerDefinition.TokenizerType.valueOf(configuration.tokenizer().name()))
+                        .end();
             }
             default -> throw new IllegalArgumentException("Unknown splitter name: " + name);
         }
-    }
-
-    public static String[] split(DocumentSplitter splitter, String body) {
-        if (splitter instanceof DocumentBySentenceSplitter ds) {
-            return ds.split(body);
-        } else {
-            if (splitter instanceof DocumentByParagraphSplitter dp) {
-                return dp.split(body);
-            } else {
-                if (splitter instanceof DocumentByCharacterSplitter dc) {
-                    return dc.split(body);
-                } else {
-                    if (splitter instanceof DocumentByWordSplitter dw) {
-                        return dw.split(body);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public static DocumentSplitter createDocumentSplitter(Exchange exchange, IngestionSourceConfiguration configuration) {
-        final Tokenizer tokenizer = new OpenAiTokenizer();
-
-        DocumentSplitter splitter;
-        String splitterName = exchange.getMessage().getHeader(UserParams.SPLITTER_NAME, String.class);
-        if (splitterName != null) {
-            final IngestionSourceConfiguration.Splitter splitterConf = configuration.splitter();
-            splitter = SplitterUtil.byName(splitterName, splitterConf.maxTokens(), splitterConf.maxOverlap(),
-                    tokenizer);
-        } else {
-            splitter = SplitterUtil.fromConfiguration(configuration, tokenizer);
-        }
-        return splitter;
     }
 }

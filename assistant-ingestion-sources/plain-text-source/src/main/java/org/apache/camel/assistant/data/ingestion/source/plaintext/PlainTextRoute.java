@@ -25,15 +25,14 @@ import java.util.List;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import dev.langchain4j.data.document.DocumentSplitter;
 import io.quarkus.arc.Unremovable;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.assistant.data.ingestion.source.common.IngestionSourceConfiguration;
 import org.apache.camel.assistant.data.ingestion.source.common.SplitterUtil;
 import org.apache.camel.assistant.data.ingestion.source.common.UserParams;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.tokenizer.LangChain4jTokenizerDefinition;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jboss.logging.Logger;
@@ -42,8 +41,6 @@ import org.jboss.logging.Logger;
 @Unremovable
 public class PlainTextRoute extends RouteBuilder {
     private static final Logger LOG = Logger.getLogger(PlainTextRoute.class);
-
-    private static final String DATA_SIZE = "DATA_SIZE";
 
     @Inject
     CamelContext context;
@@ -70,7 +67,6 @@ public class PlainTextRoute extends RouteBuilder {
             }
         }
 
-        e.getMessage().setHeader(DATA_SIZE, body.length);
         e.getMessage().setBody(document);
     }
 
@@ -95,18 +91,6 @@ public class PlainTextRoute extends RouteBuilder {
         return pagesToRemove;
     }
 
-    private void chunkProcessor(Exchange exchange) {
-        final String body = exchange.getMessage().getBody(String.class);
-        final ProducerTemplate producerTemplate = context.createProducerTemplate();
-
-        final DocumentSplitter splitter = SplitterUtil.createDocumentSplitter(exchange, configuration);
-        final String[] parts = SplitterUtil.split(splitter, body);
-
-        for (int i = 0; i < parts.length; i++) {
-            producerTemplate.sendBody("kafka:ingestion", parts[i]);
-        }
-    }
-
     @Override
     public void configure() {
         rest("/api")
@@ -120,17 +104,27 @@ public class PlainTextRoute extends RouteBuilder {
                 .routeId("source-web-hello")
                 .transform().constant("Hello World");
 
+        // A slightly more complex configuration, so that we can have flexibility choosing the splitter
+        final LangChain4jTokenizerDefinition tokenizerDefinition = SplitterUtil.createTokenizer(tokenizer(), configuration);
 
         from("direct:consumePdfStatic")
                 .routeId("source-consume-pdf-static-route")
                 .process(this::convertBytesToPDFFile)
                 .pipeline()
-                    .to("pdf:extractText")
-                    .process(this::chunkProcessor);
+                .to("pdf:extractText")
+                .to("seda:chunk?waitForTaskToComplete=Never")
+                .transform().constant("Static data queued for chunking and loading");
 
         from("direct:consumeFileStatic")
                 .routeId("source-consume-file-static-route")
-                .process(this::chunkProcessor);
+                .to("seda:chunk?waitForTaskToComplete=Never")
+                .transform().constant("Static data queued for chunking and loading");
+
+        from("seda:chunk?concurrentConsumers=2&exchangePattern=InOnly")
+                .routeId("source-chunk-route")
+                .tokenize(tokenizerDefinition)
+                .split().body()
+                        .to("kafka:ingestion");
 
         from("direct:consumeTextDynamic")
                 .routeId("source-consume-text-dynamic-route")

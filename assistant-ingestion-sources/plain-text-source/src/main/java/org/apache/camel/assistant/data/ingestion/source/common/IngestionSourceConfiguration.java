@@ -26,7 +26,7 @@ public interface IngestionSourceConfiguration {
     Tokenizer tokenizer();
 
     interface Tokenizer {
-        @WithDefault("openai")
+        @WithDefault("OPEN_AI")
         String name();
     }
 
