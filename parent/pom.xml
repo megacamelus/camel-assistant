@@ -62,7 +62,7 @@
         <picocli.version>4.7.5</picocli.version>
         <vaadin.version>24.4.13</vaadin.version>
 
-        <camel.version>4.6.0</camel.version>
+        <camel.version>4.8.6</camel.version>
 
         <quarkus.langchain.version>0.20.3</quarkus.langchain.version>
 
