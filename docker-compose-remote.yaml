@@ -47,7 +47,7 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
   qdrant:
-    image: qdrant/qdrant:v1.9.7-unprivileged
+    image: qdrant/qdrant:v1.13.6-unprivileged
     ports:
       - "6333:6333"
       - "6334:6334"
