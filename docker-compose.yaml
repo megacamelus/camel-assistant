@@ -53,7 +53,7 @@ services:
     environment:
       OLLAMA_HOST: ":8000"
   qdrant:
-    image: qdrant/qdrant:v1.9.7-unprivileged
+    image: qdrant/qdrant:v1.13.6-unprivileged
     ports:
       - "6333:6333"
       - "6334:6334"
